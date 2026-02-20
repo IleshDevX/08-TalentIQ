@@ -538,7 +538,15 @@ button[kind="header"] { visibility: visible !important; }
 }
 
 /* ─── ATS Breakdown Metric Bars ────────────────────────────────────── */
-.ats-breakdown { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; }
+.ats-breakdown { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 16px; 
+    margin-top: 12px; 
+}
+@media (max-width: 1024px) {
+    .ats-breakdown { grid-template-columns: 1fr; }
+}
 .ats-metric {
     background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 12px;
     padding: 14px 18px; transition: box-shadow 0.2s ease;
@@ -1636,7 +1644,6 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
             </div>""", unsafe_allow_html=True)
             st.markdown('<div class="spacer-md"></div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown('<div class="card-title"><span class="card-title-icon" style="background:#FFFBEB;">💡</span> Improvement Suggestions</div>', unsafe_allow_html=True)
 
         suggestions = improvements.get("suggestions", improvements.get("improvements", []))
