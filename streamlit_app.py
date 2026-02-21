@@ -2158,182 +2158,643 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
             st.info("No role matching data available.")
 
     # ─────────────────────────────────────────────────────────
-    # TAB 3 — JD Comparison + ATS Simulation (merged)
+    # TAB 3 — JD & ATS Analysis (Complete Redesign)
     # ─────────────────────────────────────────────────────────
     with tabs[2]:
-        # — JD Comparison Section —
-        if jd_comp:
-            overall = jd_comp.get("overall_match_percent", 0)
-            st.markdown(f'''
-            <div class="score-hero anim-up">
-                <div class="score-hero-val">{overall:.1f}%</div>
-                <div class="score-hero-label">Overall JD Match</div>
-                <div class="score-hero-sub">{_label(overall)}</div>
-            </div>''', unsafe_allow_html=True)
-            st.markdown('<div class="spacer-md"></div>', unsafe_allow_html=True)
-
-            jc1, jc2 = st.columns(2, gap="medium")
-            with jc1:
-                matched_kw = jd_comp.get("matched_keywords", [])
-                st.markdown(f'''
-                <div class="glass-panel">
-                    <div class="glass-panel-header">
-                        <div class="gp-icon" style="background:#ECFDF5;">✅</div>
-                        <div class="gp-title">Matched Keywords</div>
-                        <div class="gp-count">{len(matched_kw)}</div>
+        if jd_comp or ats_sim:
+            # Extract all data
+            overall = jd_comp.get("overall_match_percent", 0) if jd_comp else 0
+            matched_kw = jd_comp.get("matched_keywords", []) if jd_comp else []
+            missing_kw = jd_comp.get("missing_keywords", []) if jd_comp else []
+            section_scores = jd_comp.get("section_scores", {}) if jd_comp else {}
+            
+            ats_compat = ats_sim.get("ats_compatibility_score", 0) if ats_sim else 0
+            kw_report = ats_sim.get("keyword_report", {}) if ats_sim else {}
+            sections_complete = ats_sim.get("section_completeness", {}) if ats_sim else {}
+            readability = ats_sim.get("readability", {}) if ats_sim else {}
+            risks = ats_sim.get("formatting_risks", []) if ats_sim else []
+            alerts = ats_sim.get("alerts", []) if ats_sim else []
+            
+            # Calculate combined score
+            combined_score = (overall + ats_compat) / 2 if (overall and ats_compat) else (overall or ats_compat)
+            
+            # Determine grade
+            def get_grade(score):
+                if score >= 90: return ("A+", "#10B981", "Exceptional")
+                elif score >= 80: return ("A", "#10B981", "Excellent")
+                elif score >= 70: return ("B+", "#6366F1", "Very Good")
+                elif score >= 60: return ("B", "#6366F1", "Good")
+                elif score >= 50: return ("C+", "#F59E0B", "Average")
+                elif score >= 40: return ("C", "#F59E0B", "Below Average")
+                else: return ("D", "#EF4444", "Needs Work")
+            
+            grade, grade_color, grade_label = get_grade(combined_score)
+            
+            # ═══════════════════════════════════════════════════════════
+            # TOP SECTION: Score Dashboard with 3 Metric Cards
+            # ═══════════════════════════════════════════════════════════
+            
+            score_dashboard_html = f'''
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                    body {{ font-family: 'Inter', -apple-system, sans-serif; background: transparent; }}
+                    .dashboard {{
+                        display: grid;
+                        grid-template-columns: 1fr 2fr 1fr;
+                        gap: 1.5rem;
+                        padding: 1rem 0;
+                    }}
+                    .metric-card {{
+                        background: #FFFFFF;
+                        border: 1px solid #E2E8F0;
+                        border-radius: 16px;
+                        padding: 1.5rem;
+                        text-align: center;
+                        position: relative;
+                        overflow: hidden;
+                    }}
+                    .metric-card::before {{
+                        content: '';
+                        position: absolute;
+                        top: 0; left: 0; right: 0;
+                        height: 3px;
+                    }}
+                    .card-jd::before {{ background: linear-gradient(90deg, #6366F1, #8B5CF6); }}
+                    .card-grade::before {{ background: linear-gradient(90deg, #F59E0B, #FBBF24); }}
+                    .card-ats::before {{ background: linear-gradient(90deg, #10B981, #34D399); }}
+                    
+                    .metric-label {{ font-size: 0.75rem; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }}
+                    .metric-value {{ font-size: 2.5rem; font-weight: 800; line-height: 1; margin-bottom: 0.25rem; }}
+                    .metric-sub {{ font-size: 0.85rem; color: #6B7280; font-weight: 500; }}
+                    
+                    .grade-card {{
+                        background: linear-gradient(135deg, #FEFCE8 0%, #FEF9C3 100%);
+                        border: 2px solid #FDE68A;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                    }}
+                    .grade-value {{ font-size: 4rem; font-weight: 900; color: {grade_color}; line-height: 1; }}
+                    .grade-label {{ font-size: 1rem; font-weight: 700; color: {grade_color}; margin-top: 0.5rem; }}
+                    
+                    .ring-container {{ position: relative; width: 100px; height: 100px; margin: 0 auto 0.75rem; }}
+                </style>
+            </head>
+            <body>
+                <div class="dashboard">
+                    <div class="metric-card card-jd">
+                        <div class="metric-label">JD Match</div>
+                        <div class="ring-container">
+                            <svg width="100" height="100" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="40" fill="none" stroke="#E5E7EB" stroke-width="8"/>
+                                <circle cx="50" cy="50" r="40" fill="none" stroke="#6366F1" stroke-width="8"
+                                        stroke-dasharray="{overall * 2.51} 251" 
+                                        stroke-linecap="round" 
+                                        transform="rotate(-90 50 50)"/>
+                                <text x="50" y="55" text-anchor="middle" font-size="20" font-weight="800" fill="#1F2937">{overall:.0f}%</text>
+                            </svg>
+                        </div>
+                        <div class="metric-sub">Resume vs Job Description</div>
                     </div>
-                </div>''', unsafe_allow_html=True)
-                if matched_kw:
-                    st.markdown(chips_html(matched_kw, "chip-matched"), unsafe_allow_html=True)
-                else:
-                    st.info("No matched keywords found.")
-            with jc2:
-                missing_kw = jd_comp.get("missing_keywords", [])
-                st.markdown(f'''
-                <div class="glass-panel">
-                    <div class="glass-panel-header">
-                        <div class="gp-icon" style="background:#FFF7ED;">❌</div>
-                        <div class="gp-title">Missing Keywords</div>
-                        <div class="gp-count">{len(missing_kw)}</div>
+                    
+                    <div class="metric-card grade-card">
+                        <div class="metric-label">Overall Grade</div>
+                        <div class="grade-value">{grade}</div>
+                        <div class="grade-label">{grade_label}</div>
                     </div>
-                </div>''', unsafe_allow_html=True)
-                if missing_kw:
-                    st.markdown(chips_html(missing_kw, "chip-missing"), unsafe_allow_html=True)
-                else:
-                    st.success("No missing keywords! Excellent coverage.")
-
-            section_scores = jd_comp.get("section_scores", {})
+                    
+                    <div class="metric-card card-ats">
+                        <div class="metric-label">ATS Score</div>
+                        <div class="ring-container">
+                            <svg width="100" height="100" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="40" fill="none" stroke="#E5E7EB" stroke-width="8"/>
+                                <circle cx="50" cy="50" r="40" fill="none" stroke="#10B981" stroke-width="8"
+                                        stroke-dasharray="{ats_compat * 2.51} 251" 
+                                        stroke-linecap="round" 
+                                        transform="rotate(-90 50 50)"/>
+                                <text x="50" y="55" text-anchor="middle" font-size="20" font-weight="800" fill="#1F2937">{ats_compat:.0f}%</text>
+                            </svg>
+                        </div>
+                        <div class="metric-sub">ATS Compatibility</div>
+                    </div>
+                </div>
+            </body>
+            </html>
+            '''
+            components.html(score_dashboard_html, height=220)
+            
+            # ═══════════════════════════════════════════════════════════
+            # KEYWORD ANALYSIS - Dual Panel with Visual Indicators
+            # ═══════════════════════════════════════════════════════════
+            
+            total_kw = len(matched_kw) + len(missing_kw)
+            match_rate = (len(matched_kw) / total_kw * 100) if total_kw > 0 else 0
+            
+            # Build matched keywords HTML
+            matched_chips = ''.join([f'<span class="kw-chip matched">{kw}</span>' for kw in matched_kw[:20]])
+            more_matched = f'<span class="kw-more">+{len(matched_kw) - 20} more</span>' if len(matched_kw) > 20 else ''
+            
+            # Build missing keywords HTML
+            missing_chips = ''.join([f'<span class="kw-chip missing">{kw}</span>' for kw in missing_kw[:15]])
+            more_missing = f'<span class="kw-more">+{len(missing_kw) - 15} more</span>' if len(missing_kw) > 15 else ''
+            
+            keyword_html = f'''
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                    body {{ font-family: 'Inter', -apple-system, sans-serif; background: transparent; }}
+                    .kw-section {{
+                        background: #FFFFFF;
+                        border: 1px solid #E2E8F0;
+                        border-radius: 16px;
+                        padding: 1.5rem;
+                        margin-bottom: 1rem;
+                    }}
+                    .kw-header {{
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        margin-bottom: 1rem;
+                        padding-bottom: 1rem;
+                        border-bottom: 1px solid #F1F5F9;
+                    }}
+                    .kw-title-area {{ display: flex; align-items: center; gap: 12px; }}
+                    .kw-icon {{
+                        width: 40px; height: 40px;
+                        border-radius: 10px;
+                        display: flex; align-items: center; justify-content: center;
+                        font-size: 1.2rem;
+                    }}
+                    .kw-icon-green {{ background: #ECFDF5; }}
+                    .kw-icon-red {{ background: #FEF2F2; }}
+                    .kw-title {{ font-size: 1.1rem; font-weight: 700; color: #1F2937; }}
+                    .kw-stats {{ display: flex; align-items: center; gap: 1rem; }}
+                    .kw-stat {{
+                        display: flex; align-items: center; gap: 6px;
+                        padding: 6px 14px;
+                        border-radius: 99px;
+                        font-size: 0.85rem;
+                        font-weight: 700;
+                    }}
+                    .kw-stat-green {{ background: #ECFDF5; color: #047857; }}
+                    .kw-stat-red {{ background: #FEF2F2; color: #DC2626; }}
+                    .kw-stat-blue {{ background: #EFF6FF; color: #1D4ED8; }}
+                    
+                    .kw-content {{ display: flex; gap: 1.5rem; }}
+                    .kw-panel {{ flex: 1; }}
+                    .kw-panel-title {{
+                        font-size: 0.75rem;
+                        font-weight: 700;
+                        color: #6B7280;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        margin-bottom: 0.75rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                    }}
+                    .kw-chips {{ display: flex; flex-wrap: wrap; gap: 8px; }}
+                    .kw-chip {{
+                        padding: 6px 12px;
+                        border-radius: 6px;
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                    }}
+                    .kw-chip.matched {{ background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }}
+                    .kw-chip.missing {{ background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }}
+                    .kw-more {{ font-size: 0.8rem; color: #6B7280; font-style: italic; padding: 6px; }}
+                    
+                    .kw-progress {{
+                        margin-top: 1rem;
+                        padding-top: 1rem;
+                        border-top: 1px solid #F1F5F9;
+                    }}
+                    .kw-progress-label {{
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        color: #475569;
+                        margin-bottom: 0.5rem;
+                        display: flex;
+                        justify-content: space-between;
+                    }}
+                    .kw-progress-bar {{
+                        height: 8px;
+                        background: #FEE2E2;
+                        border-radius: 99px;
+                        overflow: hidden;
+                    }}
+                    .kw-progress-fill {{
+                        height: 100%;
+                        background: linear-gradient(90deg, #10B981, #34D399);
+                        border-radius: 99px;
+                        width: {match_rate}%;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="kw-section">
+                    <div class="kw-header">
+                        <div class="kw-title-area">
+                            <div class="kw-icon kw-icon-green">🔑</div>
+                            <div class="kw-title">Keyword Analysis</div>
+                        </div>
+                        <div class="kw-stats">
+                            <div class="kw-stat kw-stat-green">✓ {len(matched_kw)} Found</div>
+                            <div class="kw-stat kw-stat-red">✗ {len(missing_kw)} Missing</div>
+                            <div class="kw-stat kw-stat-blue">{match_rate:.0f}% Match Rate</div>
+                        </div>
+                    </div>
+                    
+                    <div class="kw-content">
+                        <div class="kw-panel">
+                            <div class="kw-panel-title">
+                                <span style="color:#10B981;">●</span> Keywords Found in Resume
+                            </div>
+                            <div class="kw-chips">
+                                {matched_chips}
+                                {more_matched}
+                            </div>
+                        </div>
+                        <div class="kw-panel">
+                            <div class="kw-panel-title">
+                                <span style="color:#EF4444;">●</span> Keywords to Add
+                            </div>
+                            <div class="kw-chips">
+                                {missing_chips}
+                                {more_missing}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="kw-progress">
+                        <div class="kw-progress-label">
+                            <span>Keyword Coverage</span>
+                            <span style="font-weight:800;color:#10B981;">{match_rate:.0f}%</span>
+                        </div>
+                        <div class="kw-progress-bar">
+                            <div class="kw-progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+            '''
+            
+            # Calculate height based on content
+            kw_height = 320 if (len(matched_kw) > 10 or len(missing_kw) > 8) else 280
+            components.html(keyword_html, height=kw_height)
+            
+            # ═══════════════════════════════════════════════════════════
+            # SECTION COVERAGE - Horizontal Progress Bars with Icons
+            # ═══════════════════════════════════════════════════════════
+            
             if section_scores:
-                st.markdown('<div class="spacer-sm"></div>', unsafe_allow_html=True)
-                st.markdown('''
-                <div class="glass-panel">
-                    <div class="glass-panel-header">
-                        <div class="gp-icon" style="background:#F5F3FF;">📊</div>
-                        <div class="gp-title">Section-wise Coverage</div>
-                    </div>
-                </div>''', unsafe_allow_html=True)
-                
-                # Properly extract and validate section scores
-                section_mapping = {
-                    "skills": "Skills",
-                    "experience": "Experience",
-                    "education": "Education",
-                    "tools": "Tools",
-                    "certifications": "Certifications",
-                    "projects": "Projects"
+                section_icons = {
+                    "skills": "💻",
+                    "experience": "📈",
+                    "education": "🎓",
+                    "tools": "🔧",
+                    "certifications": "📜",
+                    "projects": "🚀"
                 }
+                section_order = ["skills", "experience", "education"]
                 
-                # Desired display order
-                section_order = ["skills", "experience", "education", "tools", "certifications", "projects"]
+                section_bars_html = ''
+                for key in section_order:
+                    if key in section_scores:
+                        val = section_scores[key]
+                        if isinstance(val, dict):
+                            val = val.get("relevance_percent", 0)
+                        val = max(0, min(100, float(val) if isinstance(val, (int, float)) else 0))
+                        
+                        # Color based on value
+                        if val >= 70:
+                            bar_color = "#10B981"
+                        elif val >= 50:
+                            bar_color = "#6366F1"
+                        elif val >= 30:
+                            bar_color = "#F59E0B"
+                        else:
+                            bar_color = "#EF4444"
+                        
+                        icon = section_icons.get(key, "📊")
+                        label = key.title()
+                        
+                        section_bars_html += f'''
+                        <div class="sec-row">
+                            <div class="sec-info">
+                                <span class="sec-icon">{icon}</span>
+                                <span class="sec-name">{label}</span>
+                            </div>
+                            <div class="sec-bar-container">
+                                <div class="sec-bar-track">
+                                    <div class="sec-bar-fill" style="width:{val}%;background:{bar_color};"></div>
+                                </div>
+                            </div>
+                            <div class="sec-value" style="color:{bar_color};">{val:.0f}%</div>
+                        </div>
+                        '''
                 
-                # Build filtered and validated data
-                sec_labels = []
-                sec_values = []
+                section_html = f'''
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                        body {{ font-family: 'Inter', -apple-system, sans-serif; background: transparent; }}
+                        .section-card {{
+                            background: #FFFFFF;
+                            border: 1px solid #E2E8F0;
+                            border-radius: 16px;
+                            padding: 1.5rem;
+                        }}
+                        .section-title {{
+                            font-size: 1.1rem;
+                            font-weight: 700;
+                            color: #1F2937;
+                            margin-bottom: 1.25rem;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                        }}
+                        .section-title-icon {{
+                            width: 36px; height: 36px;
+                            background: #F5F3FF;
+                            border-radius: 10px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1.1rem;
+                        }}
+                        .sec-row {{
+                            display: flex;
+                            align-items: center;
+                            gap: 1rem;
+                            padding: 0.75rem 0;
+                            border-bottom: 1px solid #F8FAFC;
+                        }}
+                        .sec-row:last-child {{ border-bottom: none; }}
+                        .sec-info {{
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            min-width: 140px;
+                        }}
+                        .sec-icon {{ font-size: 1.25rem; }}
+                        .sec-name {{ font-size: 0.95rem; font-weight: 600; color: #374151; }}
+                        .sec-bar-container {{ flex: 1; }}
+                        .sec-bar-track {{
+                            height: 10px;
+                            background: #F1F5F9;
+                            border-radius: 99px;
+                            overflow: hidden;
+                        }}
+                        .sec-bar-fill {{
+                            height: 100%;
+                            border-radius: 99px;
+                            transition: width 0.8s ease;
+                        }}
+                        .sec-value {{
+                            font-size: 1rem;
+                            font-weight: 800;
+                            min-width: 50px;
+                            text-align: right;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <div class="section-card">
+                        <div class="section-title">
+                            <div class="section-title-icon">📊</div>
+                            Section Coverage
+                        </div>
+                        {section_bars_html}
+                    </div>
+                </body>
+                </html>
+                '''
+                # Dynamic height based on number of sections
+                section_count = len([k for k in section_order if k in section_scores])
+                section_height = 100 + (section_count * 52)
+                components.html(section_html, height=section_height)
+            
+            # ═══════════════════════════════════════════════════════════
+            # ATS DEEP DIVE - Expandable Sections
+            # ═══════════════════════════════════════════════════════════
+            
+            st.markdown('<div style="height: 1rem;"></div>', unsafe_allow_html=True)
+            
+            # Resume Health Checklist
+            if sections_complete or readability:
+                checklist_items = ''
+                check_count = 0
+                total_checks = 0
                 
-                for section_key in section_order:
-                    if section_key in section_scores:
-                        value = section_scores[section_key]
-                        # Validate and normalize value
-                        if isinstance(value, (int, float)):
-                            # Ensure value is within 0-100 range
-                            normalized_value = max(0, min(100, float(value)))
-                            sec_labels.append(section_mapping.get(section_key, section_key.title()))
-                            sec_values.append(normalized_value)
+                # Section completeness
+                for sec_name, found in sections_complete.items():
+                    label = sec_name.replace("_", " ").title()
+                    icon = "✓" if found else "✗"
+                    color = "#10B981" if found else "#EF4444"
+                    bg = "#ECFDF5" if found else "#FEF2F2"
+                    if found:
+                        check_count += 1
+                    total_checks += 1
+                    checklist_items += f'<div class="check-item" style="background:{bg};"><span style="color:{color};font-weight:700;">{icon}</span> {label}</div>'
                 
-                # Only display if we have valid data
-                if sec_labels and sec_values:
-                    st.plotly_chart(
-                        make_bar(sec_labels, sec_values, "", "auto"), 
-                        use_container_width=True, 
-                        key="bar_sec",
-                        config={'displayModeBar': False, 'staticPlot': False, 'responsive': True}
-                    )
-                else:
-                    st.info("No section-wise coverage data available.")
+                # Readability metrics
+                readability_score = readability.get("score", 0)
+                bullet_count = readability.get("bullet_count", 0)
+                action_verbs = readability.get("action_verb_count", 0)
+                quantified = readability.get("quantified_achievements", 0)
+                
+                health_score = (check_count / total_checks * 100) if total_checks > 0 else 0
+                
+                health_html = f'''
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                        body {{ font-family: 'Inter', -apple-system, sans-serif; background: transparent; }}
+                        .health-container {{
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 1rem;
+                        }}
+                        .health-card {{
+                            background: #FFFFFF;
+                            border: 1px solid #E2E8F0;
+                            border-radius: 16px;
+                            padding: 1.25rem;
+                        }}
+                        .health-title {{
+                            font-size: 0.95rem;
+                            font-weight: 700;
+                            color: #1F2937;
+                            margin-bottom: 1rem;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        }}
+                        .health-title-icon {{
+                            width: 32px; height: 32px;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1rem;
+                        }}
+                        .check-grid {{
+                            display: grid;
+                            grid-template-columns: repeat(2, 1fr);
+                            gap: 8px;
+                        }}
+                        .check-item {{
+                            padding: 8px 12px;
+                            border-radius: 8px;
+                            font-size: 0.85rem;
+                            font-weight: 500;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        }}
+                        .metric-grid {{
+                            display: grid;
+                            grid-template-columns: repeat(2, 1fr);
+                            gap: 12px;
+                        }}
+                        .metric-box {{
+                            background: #F8FAFC;
+                            border-radius: 12px;
+                            padding: 1rem;
+                            text-align: center;
+                        }}
+                        .metric-val {{ font-size: 1.5rem; font-weight: 800; color: #1F2937; }}
+                        .metric-label {{ font-size: 0.75rem; color: #6B7280; font-weight: 600; margin-top: 4px; }}
+                    </style>
+                </head>
+                <body>
+                    <div class="health-container">
+                        <div class="health-card">
+                            <div class="health-title">
+                                <div class="health-title-icon" style="background:#ECFDF5;">✓</div>
+                                Resume Checklist ({check_count}/{total_checks})
+                            </div>
+                            <div class="check-grid">
+                                {checklist_items}
+                            </div>
+                        </div>
+                        <div class="health-card">
+                            <div class="health-title">
+                                <div class="health-title-icon" style="background:#EEF2FF;">📖</div>
+                                Readability Metrics
+                            </div>
+                            <div class="metric-grid">
+                                <div class="metric-box">
+                                    <div class="metric-val">{readability_score:.0f}%</div>
+                                    <div class="metric-label">Readability Score</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="metric-val">{bullet_count}</div>
+                                    <div class="metric-label">Bullet Points</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="metric-val">{action_verbs}</div>
+                                    <div class="metric-label">Action Verbs</div>
+                                </div>
+                                <div class="metric-box">
+                                    <div class="metric-val">{quantified}</div>
+                                    <div class="metric-label">Quantified Results</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                '''
+                # Dynamic height based on number of checklist items
+                checklist_count = total_checks
+                health_height = max(280, 140 + (checklist_count * 25))
+                components.html(health_html, height=health_height)
+            
+            # Alerts & Risks Section
+            if risks or alerts:
+                alert_items = ''
+                for risk in risks:
+                    alert_items += f'<div class="alert-item warning"><span class="alert-icon">⚠️</span><span>{risk}</span></div>'
+                for alert in alerts:
+                    alert_items += f'<div class="alert-item danger"><span class="alert-icon">🚨</span><span>{alert}</span></div>'
+                
+                alerts_html = f'''
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                        body {{ font-family: 'Inter', -apple-system, sans-serif; background: transparent; }}
+                        .alerts-card {{
+                            background: #FFFFFF;
+                            border: 1px solid #E2E8F0;
+                            border-radius: 16px;
+                            padding: 1.25rem;
+                            margin-top: 1rem;
+                        }}
+                        .alerts-title {{
+                            font-size: 0.95rem;
+                            font-weight: 700;
+                            color: #1F2937;
+                            margin-bottom: 1rem;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        }}
+                        .alerts-title-icon {{
+                            width: 32px; height: 32px;
+                            background: #FEF2F2;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1rem;
+                        }}
+                        .alert-item {{
+                            display: flex;
+                            align-items: flex-start;
+                            gap: 12px;
+                            padding: 12px 16px;
+                            border-radius: 10px;
+                            margin-bottom: 8px;
+                            font-size: 0.9rem;
+                            line-height: 1.5;
+                        }}
+                        .alert-item:last-child {{ margin-bottom: 0; }}
+                        .alert-item.warning {{ background: #FFFBEB; color: #92400E; border-left: 3px solid #F59E0B; }}
+                        .alert-item.danger {{ background: #FEF2F2; color: #991B1B; border-left: 3px solid #EF4444; }}
+                        .alert-icon {{ flex-shrink: 0; }}
+                    </style>
+                </head>
+                <body>
+                    <div class="alerts-card">
+                        <div class="alerts-title">
+                            <div class="alerts-title-icon">⚠️</div>
+                            Issues to Address ({len(risks) + len(alerts)})
+                        </div>
+                        {alert_items}
+                    </div>
+                </body>
+                </html>
+                '''
+                alert_height = 120 + (len(risks) + len(alerts)) * 50
+                components.html(alerts_html, height=min(alert_height, 350))
+        
         else:
             st.info("No JD comparison data — paste a job description in the sidebar.")
-
-        st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-
-        # — ATS Simulation Section —
-        st.markdown('''
-        <div class="sec-header">
-            <div class="sec-icon" style="background:#EEF2FF;">🤖</div>
-            <div class="sec-title">ATS Simulation</div>
-        </div>''', unsafe_allow_html=True)
-
-        if ats_sim:
-            a1, a2 = st.columns([1, 1], gap="medium")
-
-            with a1:
-                st.markdown('''
-                <div class="glass-panel">
-                    <div class="glass-panel-header">
-                        <div class="gp-icon" style="background:#EEF2FF;">🤖</div>
-                        <div class="gp-title">ATS Compatibility</div>
-                    </div>
-                </div>''', unsafe_allow_html=True)
-                st.plotly_chart(make_gauge(ats_sim.get("ats_compatibility_score", 0), "Compatibility"), use_container_width=True, key="gauge_sim")
-
-                kw_report = ats_sim.get("keyword_report", {})
-                if kw_report:
-                    found   = kw_report.get("found", [])
-                    missing = kw_report.get("missing", [])
-                    density = kw_report.get("density", 0)
-                    mc1, mc2, mc3 = st.columns(3)
-                    mc1.metric("Density", f"{density:.1f}%")
-                    mc2.metric("Found", len(found))
-                    mc3.metric("Missing", len(missing))
-                    with st.expander("🔍 Found Keywords"):
-                        st.markdown(chips_html(found, "chip-matched"), unsafe_allow_html=True)
-                    with st.expander("⚠️ Missing Keywords"):
-                        st.markdown(chips_html(missing, "chip-missing"), unsafe_allow_html=True)
-
-            with a2:
-                st.markdown('''
-                <div class="glass-panel">
-                    <div class="glass-panel-header">
-                        <div class="gp-icon" style="background:#F0FDFA;">📋</div>
-                        <div class="gp-title">Section Completeness</div>
-                    </div>
-                </div>''', unsafe_allow_html=True)
-                sections = ats_sim.get("section_completeness", {})
-                if sections:
-                    for sec_name, found in sections.items():
-                        label = sec_name.replace("_", " ").title()
-                        cls = "ck-pass" if found else "ck-fail"
-                        icon = "✅" if found else "❌"
-                        st.markdown(f'<div class="ck-item {cls}">{icon} {label}</div>', unsafe_allow_html=True)
-
-                readability = ats_sim.get("readability", {})
-                if readability:
-                    st.markdown('''
-                    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #F1F5F9;">
-                        <div style="font-size:0.78rem;font-weight:700;color:#475569;margin-bottom:8px;">📖 Readability</div>
-                    </div>''', unsafe_allow_html=True)
-                    r1, r2 = st.columns(2)
-                    r1.metric("Score", f"{readability.get('score', 0):.0f}%")
-                    r1.metric("Bullets", readability.get("bullet_count", 0))
-                    r2.metric("Action Verbs", readability.get("action_verb_count", 0))
-                    r2.metric("Quantified", readability.get("quantified_achievements", 0))
-
-            risks  = ats_sim.get("formatting_risks", [])
-            alerts = ats_sim.get("alerts", [])
-            if risks or alerts:
-                st.markdown('<div class="spacer-sm"></div>', unsafe_allow_html=True)
-                st.markdown('''
-                <div class="glass-panel">
-                    <div class="glass-panel-header">
-                        <div class="gp-icon" style="background:#FEF2F2;">⚠️</div>
-                        <div class="gp-title">Alerts & Risks</div>
-                    </div>
-                </div>''', unsafe_allow_html=True)
-                for risk in risks:
-                    st.markdown(f'<div class="insight-row ir-amber">⚠️ {risk}</div>', unsafe_allow_html=True)
-                for alert in alerts:
-                    st.markdown(f'<div class="insight-row ir-red">🚨 {alert}</div>', unsafe_allow_html=True)
-        else:
-            st.info("No ATS simulation data available.")
 
     # ─────────────────────────────────────────────────────────
     # TAB 4 — Skills & Gaps
