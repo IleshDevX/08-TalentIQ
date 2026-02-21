@@ -32,7 +32,14 @@ processes: list[subprocess.Popen] = []
 
 def start_api() -> subprocess.Popen:
     """Launch FastAPI via uvicorn."""
-    cmd = [PYTHON, "-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "8000", "--reload"]
+    cmd = [
+        PYTHON, "-m", "uvicorn", "app.main:app", 
+        "--host", "127.0.0.1", 
+        "--port", "8000", 
+        "--reload",
+        "--reload-dir", "app",
+        "--reload-dir", "datasets"
+    ]
     print(f"\n🚀 Starting TalentIQ API on http://127.0.0.1:8000")
     proc = subprocess.Popen(cmd, cwd=ROOT)
     processes.append(proc)
@@ -41,7 +48,13 @@ def start_api() -> subprocess.Popen:
 
 def start_ui() -> subprocess.Popen:
     """Launch Streamlit dashboard."""
-    cmd = [PYTHON, "-m", "streamlit", "run", "streamlit_app.py", "--server.port", "8501", "--server.headless", "true"]
+    cmd = [
+        PYTHON, "-m", "streamlit", "run", "streamlit_app.py",
+        "--server.port", "8501",
+        "--server.headless", "true",
+        "--server.fileWatcherType", "auto",
+        "--server.runOnSave", "true"
+    ]
     print(f"🖥️  Starting TalentIQ Dashboard on http://127.0.0.1:8501")
     proc = subprocess.Popen(cmd, cwd=ROOT)
     processes.append(proc)

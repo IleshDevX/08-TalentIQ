@@ -16,6 +16,7 @@ Run:  streamlit run streamlit_app.py
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import requests
 import json
 import plotly.graph_objects as go
@@ -114,11 +115,11 @@ button[kind="header"] { visibility: visible !important; }
 .top-banner {
     background: linear-gradient(135deg, #4F46E5 0%, #6366F1 30%, #818CF8 60%, #A78BFA 100%);
     border-radius: var(--radius-xl);
-    padding: 1.8rem 2.5rem;
+    padding: 1.4rem 2rem;
     display: flex; align-items: center; justify-content: space-between;
     box-shadow: 0 8px 32px rgba(99,102,241,0.25);
     position: relative; overflow: hidden;
-    margin: 2.5rem 0 1.8rem 0;
+    margin: 1.8rem 0 1.4rem 0;
 }
 .top-banner::before {
     content: ''; position: absolute; top: -60%; right: -10%;
@@ -174,13 +175,13 @@ button[kind="header"] { visibility: visible !important; }
 /* ─── Score Ring (CSS only) ────────────────────────────────────────── */
 .ring-row {
     display: flex; gap: 16px; flex-wrap: wrap;
-    justify-content: center; margin: 0.8rem 0;
+    justify-content: center; margin: 0.6rem 0;
 }
 .ring-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 1.4rem 1.5rem;
+    padding: 1rem 1.2rem;
     flex: 1 1 170px; max-width: 220px;
     text-align: center;
     box-shadow: var(--shadow-sm);
@@ -204,7 +205,7 @@ button[kind="header"] { visibility: visible !important; }
 .ring-card.rc-green::after   { background: linear-gradient(90deg,#10B981,#34D399); }
 .ring-card.rc-coral::after   { background: linear-gradient(90deg,#F87171,#FCA5A5); }
 
-.ring-svg { width: 90px; height: 90px; margin: 0 auto 10px auto; display: block; }
+.ring-svg { width: 90px; height: 90px; margin: 0 auto 8px auto; display: block; }
 .ring-track { fill: none; stroke: #F1F5F9; stroke-width: 6; }
 .ring-fill {
     fill: none; stroke-width: 6; stroke-linecap: round;
@@ -228,8 +229,8 @@ button[kind="header"] { visibility: visible !important; }
 /* ─── Section Headers ──────────────────────────────────────────────── */
 .sec-header {
     display: flex; align-items: center; gap: 12px;
-    margin: 1.8rem 0 1.2rem 0;
-    padding-bottom: 0.8rem;
+    margin: 1.2rem 0 0.8rem 0;
+    padding-bottom: 0.5rem;
 }
 .sec-icon {
     width: 40px; height: 40px; border-radius: 10px;
@@ -251,17 +252,17 @@ button[kind="header"] { visibility: visible !important; }
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 1.8rem;
+    padding: 1.2rem;
     box-shadow: var(--shadow-sm);
     transition: var(--transition);
-    margin-bottom: 1.2rem;
+    margin-bottom: 0;
 }
 .glass-panel:hover {
     box-shadow: var(--shadow-md);
 }
 .glass-panel-header {
     display: flex; align-items: center; gap: 12px;
-    margin-bottom: 1.2rem; padding-bottom: 0.8rem;
+    margin-bottom: 0; padding-bottom: 0;
 }
 .gp-icon {
     width: 38px; height: 38px; border-radius: 10px;
@@ -277,6 +278,337 @@ button[kind="header"] { visibility: visible !important; }
     font-size: 0.85rem; font-weight: 600;
     color: var(--primary); background: var(--primary-bg);
     padding: 4px 14px; border-radius: 10px;
+}
+
+/* ─── Profile Cards (Candidate Profile) ────────────────────────────── */
+.profile-grid {
+    display: grid;
+    gap: 1.2rem;
+}
+.profile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 0;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+.profile-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    border-color: #C7D2FE;
+}
+.profile-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 1.2rem 1.2rem 1rem 1.2rem;
+    border-bottom: 1px solid var(--border-light);
+    background: linear-gradient(to bottom, var(--surface) 0%, var(--surface-alt) 100%);
+}
+.pc-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+.pc-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.pc-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+.pc-count {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 0;
+}
+.profile-card-body {
+    padding: 1.2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.pc-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 6px 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+.pc-item-secondary {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+.pc-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+    margin-top: 8px;
+    flex-shrink: 0;
+}
+.pc-dot-secondary {
+    width: 5px;
+    height: 5px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    margin-top: 7px;
+    flex-shrink: 0;
+}
+.pc-divider {
+    height: 1px;
+    background: var(--border-light);
+    margin: 8px 0;
+}
+.pc-section-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 4px 0 6px 0;
+}
+.pc-highlight {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--primary-bg);
+    border-radius: var(--radius-sm);
+    margin-bottom: 4px;
+}
+.pc-highlight-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.pc-highlight-value {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+.pc-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.pc-empty {
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: 20px 0;
+    font-size: 0.92rem;
+}
+.pc-more {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    font-style: italic;
+    margin-top: 8px;
+}
+
+/* ─── Report Grid (Fixed Layout) ────────────────────────────────────── */
+.report-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin: 1rem 0;
+}
+@media (max-width: 1400px) {
+    .report-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 1024px) {
+    .report-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+    .report-grid { grid-template-columns: 1fr; }
+}
+
+.report-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 0;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    height: 280px;
+    overflow: hidden;
+    position: relative;
+}
+.report-box:hover {
+    box-shadow: var(--shadow-md);
+    border-color: #C7D2FE;
+}
+.report-box-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid var(--border-light);
+    background: linear-gradient(to bottom, var(--surface) 0%, var(--surface-alt) 100%);
+    flex-shrink: 0;
+}
+.rb-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+.rb-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+    flex: 1;
+}
+.rb-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+.report-box-body {
+    padding: 1rem 1.1rem;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 #F1F5F9;
+}
+.report-box-body::-webkit-scrollbar {
+    width: 6px;
+}
+.report-box-body::-webkit-scrollbar-track {
+    background: #F1F5F9;
+    border-radius: 10px;
+}
+.report-box-body::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 10px;
+}
+.report-box-body::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
+.rb-metric {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+.rb-metric-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+}
+.rb-metric-unit {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.rb-metric-label {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+.rb-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.rb-list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    border-bottom: 1px solid var(--border-light);
+}
+.rb-list-item:last-child {
+    border-bottom: none;
+}
+.rb-list-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--primary);
+    border-radius: 50%;
+    margin-top: 7px;
+    flex-shrink: 0;
+}
+.rb-list-text {
+    flex: 1;
+    word-wrap: break-word;
+}
+.rb-empty {
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: 40px 10px;
+    font-size: 0.88rem;
+}
+.rb-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+.rb-stat-row:last-child {
+    border-bottom: none;
+}
+.rb-stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+.rb-stat-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.rb-progress {
+    width: 100%;
+    height: 6px;
+    background: #F1F5F9;
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+.rb-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.8s ease;
 }
 
 /* ─── Chips ────────────────────────────────────────────────────────── */
@@ -319,8 +651,8 @@ button[kind="header"] { visibility: visible !important; }
 /* ─── Insight Rows ─────────────────────────────────────────────────── */
 .insight-row {
     display: flex; align-items: flex-start; gap: 14px;
-    padding: 14px 18px; border-radius: var(--radius-sm);
-    margin: 6px 0; font-size: 1rem; color: var(--text-secondary);
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    margin: 10px 0; font-size: 1rem; color: var(--text-secondary);
     line-height: 1.6; border-left: 4px solid transparent;
     transition: background 0.15s ease;
 }
@@ -334,7 +666,7 @@ button[kind="header"] { visibility: visible !important; }
 .score-hero {
     background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
     border-radius: var(--radius-lg);
-    padding: 2.5rem; text-align: center;
+    padding: 1.8rem; text-align: center;
     border: 1px solid #C7D2FE;
 }
 .score-hero-val {
@@ -346,10 +678,10 @@ button[kind="header"] { visibility: visible !important; }
 .score-hero-sub { font-size: 0.9rem; color: var(--text-muted); margin-top: 3px; }
 
 /* ─── Breakdown Bars ───────────────────────────────────────────────── */
-.bd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.bd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 .bd-item {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-md); padding: 18px 20px;
+    border-radius: var(--radius-md); padding: 14px 16px;
     transition: var(--transition);
 }
 .bd-item:hover { box-shadow: 0 4px 14px rgba(99,102,241,0.08); }
@@ -364,7 +696,7 @@ button[kind="header"] { visibility: visible !important; }
 /* ─── Profile Info Items ───────────────────────────────────────────── */
 .pi-item {
     display: flex; align-items: flex-start; gap: 12px;
-    padding: 10px 0; font-size: 0.95rem;
+    padding: 6px 0; font-size: 0.95rem;
 }
 .pi-item:last-child { }
 .pi-bullet { color: var(--primary); font-weight: 800; margin-top: 2px; }
@@ -385,7 +717,7 @@ button[kind="header"] { visibility: visible !important; }
 /* ─── Timeline ─────────────────────────────────────────────────────── */
 .tl-item {
     display: flex; align-items: flex-start; gap: 14px;
-    padding: 1rem 0; border-left: 2px solid var(--border);
+    padding: 0.7rem 0; border-left: 2px solid var(--border);
     margin-left: 10px; padding-left: 20px; position: relative;
 }
 .tl-item::before {
@@ -404,7 +736,7 @@ button[kind="header"] { visibility: visible !important; }
 /* ─── Action Cards ─────────────────────────────────────────────────── */
 .act-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-md); padding: 1.3rem 1.5rem;
+    border-radius: var(--radius-md); padding: 1rem 1.2rem;
     margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px;
     transition: var(--transition);
 }
@@ -430,7 +762,7 @@ button[kind="header"] { visibility: visible !important; }
 /* ─── Role Row ─────────────────────────────────────────────────────── */
 .role-row {
     display: flex; align-items: center; gap: 12px;
-    padding: 12px 10px;
+    padding: 8px 10px;
     transition: background 0.15s;
 }
 .role-row:hover { background: var(--surface-alt); }
@@ -438,7 +770,7 @@ button[kind="header"] { visibility: visible !important; }
 .role-name { font-weight: 600; color: var(--text-primary); font-size: 1.02rem; }
 
 /* ─── Hero Section (Landing) ───────────────────────────────────────── */
-.hero { text-align: center; padding: 4rem 1rem 2.5rem 1rem; }
+.hero { text-align: center; padding: 3rem 1rem 2rem 1rem; }
 .hero-title {
     font-size: 2.8rem; font-weight: 800; color: var(--text-primary);
     margin: 0 0 0.8rem 0; letter-spacing: -0.5px; line-height: 1.2;
@@ -456,7 +788,7 @@ button[kind="header"] { visibility: visible !important; }
 /* ─── Feature Cards (Landing) ──────────────────────────────────────── */
 .feat-card {
     background: var(--surface); border-radius: var(--radius-lg);
-    padding: 2rem 1.5rem; border: 1px solid var(--border);
+    padding: 1.5rem 1.2rem; border: 1px solid var(--border);
     box-shadow: var(--shadow-sm); text-align: center;
     height: 100%; transition: var(--transition);
 }
@@ -467,7 +799,7 @@ button[kind="header"] { visibility: visible !important; }
 .feat-icon {
     width: 60px; height: 60px; border-radius: var(--radius-md);
     display: inline-flex; align-items: center; justify-content: center;
-    font-size: 1.6rem; margin-bottom: 1.2rem;
+    font-size: 1.6rem; margin-bottom: 0.8rem;
 }
 .feat-title { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.6rem 0; }
 .feat-desc { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
@@ -609,10 +941,10 @@ p, li, span { font-family: 'Inter', sans-serif !important; }
 
 /* ─── Utilities ────────────────────────────────────────────────────── */
 .divider { height: 0; background: none; margin: 1.5rem 0; }
-.spacer-xs { height: 0.4rem; }
-.spacer-sm { height: 0.7rem; }
-.spacer-md { height: 1.4rem; }
-.spacer-lg { height: 2.2rem; }
+.spacer-xs { height: 0.25rem; }
+.spacer-sm { height: 0.5rem; }
+.spacer-md { height: 0.8rem; }
+.spacer-lg { height: 1.2rem; }
 
 /* ─── Responsive ───────────────────────────────────────────────────── */
 @media (max-width: 768px) {
@@ -621,6 +953,209 @@ p, li, span { font-family: 'Inter', sans-serif !important; }
     .block-container { padding: 0.8rem 1rem 2rem 1rem !important; }
     .ring-card { max-width: 100%; }
     .bd-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── Role Matches Redesign ───────────────────────────────────────── */
+.featured-role-card {
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+    border: 2px solid #E2E8F0;
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(99, 102, 241, 0.12);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+.featured-role-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6366F1, #8B5CF6, #A78BFA);
+}
+.featured-role-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 50px rgba(99, 102, 241, 0.18);
+    border-color: #C7D2FE;
+}
+.featured-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+    color: #92400E;
+    padding: 8px 16px;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    border: 1px solid #FCD34D;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+.featured-role-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+.featured-role-info {
+    flex: 1;
+    min-width: 300px;
+}
+.featured-role-category {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+.featured-role-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+}
+.target-badge-featured {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+    color: #065F46;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border: 1px solid #A7F3D0;
+}
+.featured-score-ring {
+    flex-shrink: 0;
+}
+.featured-role-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-light);
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.match-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: 1px solid currentColor;
+    border-opacity: 0.2;
+}
+.match-rank {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.section-header-minimal {
+    margin: 1.5rem 0 1rem 0;
+}
+.role-match-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.role-match-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: #C7D2FE;
+}
+.role-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.role-card-rank {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    min-width: 32px;
+}
+.role-card-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1px solid currentColor;
+    border-opacity: 0.15;
+}
+.role-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.4;
+    flex: 1;
+}
+.target-badge-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #ECFDF5;
+    color: #065F46;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1px solid #A7F3D0;
+}
+.role-card-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+}
+.mini-progress-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.role-card-strength {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-align: center;
+}
+.more-roles-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 1.2rem;
+    margin-top: 1rem;
+    background: var(--surface-alt);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 600;
 }
 
 /* ─── Animations ───────────────────────────────────────────────────── */
@@ -674,6 +1209,14 @@ def _badge_cls(score: float) -> str:
     return "badge-low"
 
 
+def _color_for_score(score: float) -> str:
+    """Return color based on score for progress bars."""
+    if score >= 80: return "#10B981"  # Green
+    if score >= 60: return "#6366F1"  # Indigo
+    if score >= 40: return "#F59E0B"  # Amber
+    return "#F87171"  # Red
+
+
 # ─── SVG Ring Builder ──────────────────────────────────────────────────
 
 def ring_svg(pct: float, color: str, size: int = 90, stroke: int = 6) -> str:
@@ -703,30 +1246,62 @@ def render_ring_card(pct, label, sub, color, accent_cls):
 # ─── Chart Builders ───────────────────────────────────────────────────────
 
 def make_radar(categories, values, title=""):
+    """Create a modern radar/spider chart matching the UI theme."""
     fig = go.Figure()
     fig.add_trace(go.Scatterpolar(
-        r=values + [values[0]], theta=categories + [categories[0]],
-        fill="toself", fillcolor="rgba(99,102,241,0.08)",
-        line=dict(color="#6366F1", width=2.5),
-        marker=dict(size=6, color="#6366F1"), name="Score",
+        r=values + [values[0]], 
+        theta=categories + [categories[0]],
+        fill="toself", 
+        fillcolor="rgba(99,102,241,0.12)",
+        line=dict(color="#6366F1", width=3),
+        marker=dict(size=8, color="#6366F1", symbol='circle', line=dict(color='white', width=2)), 
+        name="Score",
+        hovertemplate="<b>%{theta}</b><br>Score: %{r:.1f}%<extra></extra>",
     ))
     fig.update_layout(
         polar=dict(
-            radialaxis=dict(visible=True, range=[0, 100], gridcolor="#F1F5F9",
-                            linecolor="#E5E7EB", tickfont=dict(size=9, color="#94A3B8")),
-            angularaxis=dict(gridcolor="#F1F5F9", linecolor="#E5E7EB",
-                             tickfont=dict(size=10, color="#64748B", family="Inter")),
-            bgcolor="white",
+            radialaxis=dict(
+                visible=True, 
+                range=[0, 100], 
+                gridcolor="#E2E8F0",
+                gridwidth=1,
+                linecolor="#CBD5E1", 
+                tickfont=dict(size=11, color="#94A3B8", family="Inter"),
+                tickmode='linear',
+                tick0=0,
+                dtick=20
+            ),
+            angularaxis=dict(
+                gridcolor="#E2E8F0", 
+                gridwidth=1,
+                linecolor="#CBD5E1",
+                tickfont=dict(size=12, color="#475569", family="Inter", weight=600)
+            ),
+            bgcolor="rgba(255, 255, 255, 0.6)",
         ),
         showlegend=False,
-        title=dict(text=title, x=0.5, font=dict(size=12, color="#64748B", family="Inter")) if title else None,
-        height=320, margin=dict(l=55, r=55, t=45, b=25),
-        paper_bgcolor="rgba(0,0,0,0)", font={"family": "Inter, sans-serif"},
+        title=dict(
+            text=title, 
+            x=0, 
+            xanchor='left', 
+            font=dict(size=15, color="#475569", family="Inter", weight=700)
+        ) if title and title.strip() else {},
+        height=500, 
+        margin=dict(l=80, r=80, t=60, b=60),
+        paper_bgcolor="rgba(0,0,0,0)", 
+        font={"family": "Inter, sans-serif"},
+        hovermode='closest',
+        hoverlabel=dict(
+            bgcolor="white",
+            bordercolor="#E2E8F0",
+            font=dict(family="Inter", size=12, color="#0F172A")
+        )
     )
     return fig
 
 
 def make_bar(labels, values, title="", color="auto"):
+    """Create a modern horizontal bar chart matching the UI theme."""
     bar_colors = []
     for v in values:
         if v >= 80:   bar_colors.append("#10B981")
@@ -736,22 +1311,68 @@ def make_bar(labels, values, title="", color="auto"):
 
     fig = go.Figure(go.Bar(
         x=values, y=labels, orientation="h",
-        marker=dict(color=bar_colors if color == "auto" else color, cornerradius=4, line=dict(width=0)),
-        text=[f"  {v:.0f}%" for v in values], textposition="outside",
-        textfont=dict(color="#475569", size=11, family="Inter"),
-        hovertemplate="%{y}: %{x:.1f}%<extra></extra>",
+        marker=dict(
+            color=bar_colors if color == "auto" else color, 
+            cornerradius=6,
+            line=dict(width=0)
+        ),
+        text=[f"{v:.0f}%" for v in values], 
+        textposition="outside",
+        textfont=dict(color="#475569", size=12, family="Inter", weight=600),
+        hovertemplate="<b>%{y}</b><br>Match Score: %{x:.1f}%<extra></extra>",
     ))
+    
     fig.update_layout(
-        title=dict(text=title, font=dict(size=12, color="#64748B", family="Inter")) if title else None,
-        xaxis=dict(range=[0, max(values) * 1.2 if values else 105], showgrid=True,
-                   gridcolor="#F8FAFC", linecolor="#E5E7EB", zeroline=False, title="",
-                   tickfont=dict(size=9, color="#94A3B8")),
-        yaxis=dict(linecolor="#E5E7EB", tickfont=dict(size=11, color="#475569", family="Inter"), automargin=True),
-        height=max(200, len(labels) * 38 + 60),
-        margin=dict(l=10, r=40, t=35 if title else 8, b=15),
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="white",
-        font={"family": "Inter, sans-serif"}, bargap=0.3,
+        title=dict(
+            text=title, 
+            x=0, 
+            xanchor='left',
+            font=dict(size=14, color="#475569", family="Inter", weight=600)
+        ) if title and title.strip() else {},
+        xaxis=dict(
+            range=[0, max(values) * 1.15 if values else 105], 
+            showgrid=True,
+            gridcolor="#F1F5F9", 
+            gridwidth=1,
+            linecolor="#E2E8F0", 
+            linewidth=1,
+            zeroline=False, 
+            title="",
+            tickfont=dict(size=10, color="#94A3B8", family="Inter"),
+            ticksuffix="%",
+            showticksuffix="all"
+        ),
+        yaxis=dict(
+            linecolor="#E2E8F0",
+            linewidth=1,
+            tickfont=dict(size=12, color="#475569", family="Inter", weight=500), 
+            automargin=True,
+            showgrid=False
+        ),
+        height=max(220, len(labels) * 42 + 80),
+        margin=dict(l=10, r=60, t=30, b=30),
+        paper_bgcolor="rgba(0,0,0,0)", 
+        plot_bgcolor="rgba(255, 255, 255, 0.5)",
+        font={"family": "Inter, sans-serif"}, 
+        bargap=0.25,
+        hovermode='closest',
+        hoverlabel=dict(
+            bgcolor="white",
+            bordercolor="#E2E8F0",
+            font=dict(family="Inter", size=12, color="#0F172A")
+        )
     )
+    
+    # Hide Plotly toolbar and make chart non-editable
+    config = {
+        'displayModeBar': False,
+        'staticPlot': False,
+        'responsive': True
+    }
+    fig.update_layout(
+        modebar=dict(remove=['zoom', 'pan', 'select', 'lasso', 'zoomIn', 'zoomOut', 'autoScale', 'resetScale'])
+    )
+    
     return fig
 
 
@@ -1090,7 +1711,12 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
             </div>''', unsafe_allow_html=True)
             radar_cats = ["ATS Score", "Skill Match", "JD Align", "ATS Sim", "Soft Skills", "Industry"]
             radar_vals = [ats_score_val, coverage_pct, jd_match_pct, ats_sim_score, soft_score, industry_score]
-            st.plotly_chart(make_radar(radar_cats, radar_vals), use_container_width=True, key="radar_ov")
+            st.plotly_chart(
+                make_radar(radar_cats, radar_vals, title="Performance Metrics"), 
+                use_container_width=True, 
+                key="radar_ov",
+                config={'displayModeBar': False, 'staticPlot': False, 'responsive': True}
+            )
 
         # Right: Role Explanation + ATS Breakdown
         with ov_r:
@@ -1105,24 +1731,24 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
             verdict   = explanation.get("verdict", "")
             reasoning = explanation.get("reasoning", [])
             if verdict:
-                st.markdown(f"**{verdict}**")
+                st.markdown(f'<div style="margin-top: 1.2rem; font-weight: 700; font-size: 1.05rem;">{verdict}</div>', unsafe_allow_html=True)
             if reasoning:
                 colors = ["ir-blue", "ir-green", "ir-amber", "ir-blue", "ir-green", "ir-amber"]
                 for i, r in enumerate(reasoning):
                     cls = colors[i % len(colors)]
                     st.markdown(f'<div class="insight-row {cls}">{r}</div>', unsafe_allow_html=True)
 
-            st.markdown('<div class="spacer-sm"></div>', unsafe_allow_html=True)
+        st.markdown('<div class="spacer-md"></div>', unsafe_allow_html=True)
 
-            # ATS Breakdown
-            ats_bd = ats.get("breakdown", {})
-            if ats_bd:
-                st.markdown('''
-                <div class="sec-header" style="margin-top:0.8rem;">
-                    <div class="sec-icon" style="background:#EEF2FF;">📊</div>
-                    <div class="sec-title">ATS Score Breakdown</div>
-                </div>''', unsafe_allow_html=True)
-                st.markdown(breakdown_html(ats_bd), unsafe_allow_html=True)
+        # ATS Breakdown - Full Width
+        ats_bd = ats.get("breakdown", {})
+        if ats_bd:
+            st.markdown('''
+            <div class="sec-header">
+                <div class="sec-icon" style="background:#EEF2FF;">📊</div>
+                <div class="sec-title">ATS Score Breakdown</div>
+            </div>''', unsafe_allow_html=True)
+            st.markdown(breakdown_html(ats_bd), unsafe_allow_html=True)
 
         st.markdown('<div class="spacer-md"></div>', unsafe_allow_html=True)
 
@@ -1133,142 +1759,401 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
             <div class="sec-title">Candidate Profile</div>
         </div>''', unsafe_allow_html=True)
 
-        pr1, pr2 = st.columns([1, 1], gap="medium")
-
-        with pr1:
-            # Education
-            edu = profile.get("education", {})
-            if isinstance(edu, dict):
-                degrees = edu.get("degrees", [])
-                institutions = edu.get("institutions", [])
-                deg_count = len(degrees) if degrees else 0
-                edu_html = f'''
-                <div class="glass-panel">
-                    <div class="glass-panel-header">
-                        <div class="gp-icon" style="background:#EEF2FF;">🎓</div>
-                        <div class="gp-title">Education</div>
-                        <div class="gp-count">{deg_count} Degree(s)</div>
-                    </div>'''
-                if degrees:
-                    for d in degrees:
-                        edu_html += f'<div class="pi-item"><span class="pi-bullet">●</span> <span>{d}</span></div>'
-                else:
-                    edu_html += '<div style="color:#94A3B8;font-style:italic;padding:8px 0;">No degrees detected</div>'
-                if institutions:
-                    edu_html += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid #F1F5F9;">'
-                    edu_html += '<div style="font-size:0.72rem;font-weight:700;color:#6366F1;text-transform:uppercase;margin-bottom:6px;">Institutions</div>'
-                    for inst in institutions[:4]:
-                        edu_html += f'<div class="pi-item"><span class="pi-bullet">■</span> <span>{inst}</span></div>'
-                    edu_html += '</div>'
-                edu_html += '</div>'
-                st.markdown(edu_html, unsafe_allow_html=True)
-
-            # Experience
-            exp = profile.get("experience", {})
-            if isinstance(exp, dict):
-                max_yrs = exp.get("max_years", 0)
-                job_titles = exp.get("job_titles", [])
-                exp_html = f'''
-                <div class="glass-panel">
-                    <div class="glass-panel-header">
-                        <div class="gp-icon" style="background:#FEF3C7;">💼</div>
-                        <div class="gp-title">Experience</div>
-                        <div class="gp-count">{max_yrs} Year(s)</div>
+        # Prepare all data first
+        edu = profile.get("education", {})
+        exp = profile.get("experience", {})
+        raw_skills = profile.get("skills_normalized", profile.get("skills_raw", []))
+        kw = profile.get("keywords", [])
+        
+        # Build Education HTML
+        if isinstance(edu, dict):
+            degrees = edu.get("degrees", [])
+            institutions = edu.get("institutions", [])
+            deg_count = len(degrees) if degrees else 0
+            edu_html = f'''
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <div class="pc-icon" style="background:#EEF2FF;">🎓</div>
+                    <div class="pc-info">
+                        <div class="pc-title">Education</div>
+                        <div class="pc-count">{deg_count} Degree(s)</div>
                     </div>
-                    <div class="pi-item">
-                        <span class="pi-label">Total Experience:</span>
-                        <span class="pi-value" style="font-weight:700;color:#0F172A;">{max_yrs} years</span>
-                    </div>'''
-                if job_titles:
-                    exp_html += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid #F1F5F9;">'
-                    exp_html += '<div style="font-size:0.72rem;font-weight:700;color:#6366F1;text-transform:uppercase;margin-bottom:6px;">Roles Held</div>'
-                    for jt in job_titles[:5]:
-                        exp_html += f'<div class="pi-item"><span class="pi-bullet">▸</span> <span>{jt}</span></div>'
-                    if len(job_titles) > 5:
-                        exp_html += f'<div style="font-size:0.72rem;color:#94A3B8;margin-top:6px;text-align:center;font-style:italic;">…and {len(job_titles)-5} more</div>'
-                    exp_html += '</div>'
-                exp_html += '</div>'
-                st.markdown(exp_html, unsafe_allow_html=True)
-
-        with pr2:
-            # Skills
-            raw_skills = profile.get("skills_normalized", profile.get("skills_raw", []))
-            skills_count = len(raw_skills)
-            sk_html = f'''
-            <div class="glass-panel">
-                <div class="glass-panel-header">
-                    <div class="gp-icon" style="background:#F0FDFA;">🔧</div>
-                    <div class="gp-title">Technical Skills</div>
-                    <div class="gp-count">{skills_count} Skill(s)</div>
-                </div>'''
-            if raw_skills:
-                sk_html += f'<div style="margin-top:4px;">{chips_html(raw_skills[:40])}</div>'
-                if len(raw_skills) > 40:
-                    sk_html += f'<div style="font-size:0.72rem;color:#94A3B8;margin-top:8px;text-align:center;font-style:italic;">…and {len(raw_skills)-40} more</div>'
+                </div>
+                <div class="profile-card-body">'''
+            if degrees:
+                for d in degrees:
+                    edu_html += f'<div class="pc-item"><span class="pc-dot"></span><span>{d}</span></div>'
             else:
-                sk_html += '<div style="color:#94A3B8;font-style:italic;text-align:center;padding:20px 0;">No skills detected</div>'
-            sk_html += '</div>'
-            st.markdown(sk_html, unsafe_allow_html=True)
+                edu_html += '<div class="pc-empty">No degrees detected</div>'
+            if institutions:
+                edu_html += '<div class="pc-divider"></div><div class="pc-section-label">INSTITUTIONS</div>'
+                for inst in institutions[:4]:
+                    edu_html += f'<div class="pc-item pc-item-secondary"><span class="pc-dot-secondary"></span><span>{inst}</span></div>'
+            edu_html += '</div></div>'
+        else:
+            edu_html = ''
 
-            # Domain Keywords
-            kw = profile.get("keywords", [])
-            if kw:
-                kw_html = f'''
-                <div class="glass-panel">
-                    <div class="glass-panel-header">
-                        <div class="gp-icon" style="background:#FDF2F8;">🏷️</div>
-                        <div class="gp-title">Domain Keywords</div>
-                        <div class="gp-count">{len(kw)} Keyword(s)</div>
+        # Build Experience HTML
+        if isinstance(exp, dict):
+            max_yrs = exp.get("max_years", 0)
+            job_titles = exp.get("job_titles", [])
+            exp_html = f'''
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <div class="pc-icon" style="background:#FEF3C7;">💼</div>
+                    <div class="pc-info">
+                        <div class="pc-title">Experience</div>
+                        <div class="pc-count">{max_yrs} Year(s)</div>
                     </div>
-                    <div style="margin-top:4px;">{chips_html(kw[:20])}</div>'''
-                if len(kw) > 20:
-                    kw_html += f'<div style="font-size:0.72rem;color:#94A3B8;margin-top:8px;text-align:center;font-style:italic;">…and {len(kw)-20} more</div>'
-                kw_html += '</div>'
+                </div>
+                <div class="profile-card-body">
+                    <div class="pc-highlight">
+                        <span class="pc-highlight-label">Total Experience</span>
+                        <span class="pc-highlight-value">{max_yrs} years</span>
+                    </div>'''
+            if job_titles:
+                exp_html += '<div class="pc-divider"></div><div class="pc-section-label">ROLES HELD</div>'
+                for jt in job_titles[:5]:
+                    exp_html += f'<div class="pc-item"><span class="pc-dot"></span><span>{jt}</span></div>'
+                if len(job_titles) > 5:
+                    exp_html += f'<div class="pc-more">…and {len(job_titles)-5} more</div>'
+            exp_html += '</div></div>'
+        else:
+            exp_html = ''
+
+        # Build Skills HTML
+        skills_count = len(raw_skills)
+        sk_html = f'''
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <div class="pc-icon" style="background:#F0FDFA;">🔧</div>
+                <div class="pc-info">
+                    <div class="pc-title">Technical Skills</div>
+                    <div class="pc-count">{skills_count} Skill(s)</div>
+                </div>
+            </div>
+            <div class="profile-card-body">'''
+        if raw_skills:
+            sk_html += f'<div class="pc-chips">{chips_html(raw_skills[:40])}</div>'
+            if len(raw_skills) > 40:
+                sk_html += f'<div class="pc-more">…and {len(raw_skills)-40} more</div>'
+        else:
+            sk_html += '<div class="pc-empty">No skills detected</div>'
+        sk_html += '</div></div>'
+
+        # Build Keywords HTML
+        if kw:
+            kw_html = f'''
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <div class="pc-icon" style="background:#FDF2F8;">🏷️</div>
+                    <div class="pc-info">
+                        <div class="pc-title">Domain Keywords</div>
+                        <div class="pc-count">{len(kw)} Keyword(s)</div>
+                    </div>
+                </div>
+                <div class="profile-card-body">
+                    <div class="pc-chips">{chips_html(kw[:20])}</div>'''
+            if len(kw) > 20:
+                kw_html += f'<div class="pc-more">…and {len(kw)-20} more</div>'
+            kw_html += '</div></div>'
+        else:
+            kw_html = ''
+
+        # Display in balanced 2x2 grid
+        st.markdown('<div class="profile-grid">', unsafe_allow_html=True)
+        
+        pr_row1_col1, pr_row1_col2 = st.columns(2, gap="medium")
+        with pr_row1_col1:
+            st.markdown(edu_html, unsafe_allow_html=True)
+        with pr_row1_col2:
+            st.markdown(sk_html, unsafe_allow_html=True)
+        
+        st.markdown('<div style="margin: 1.2rem 0;"></div>', unsafe_allow_html=True)
+        
+        pr_row2_col1, pr_row2_col2 = st.columns(2, gap="medium")
+        with pr_row2_col1:
+            st.markdown(exp_html, unsafe_allow_html=True)
+        with pr_row2_col2:
+            if kw_html:
                 st.markdown(kw_html, unsafe_allow_html=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # ─────────────────────────────────────────────────────────
-    # TAB 2 — Role Matching
+    # TAB 2 — Role Matching (Complete Redesign)
     # ─────────────────────────────────────────────────────────
     with tabs[1]:
         top_roles = role_matches.get("top_roles", [])
         if top_roles:
-            st.markdown('''
-            <div class="glass-panel">
-                <div class="glass-panel-header">
-                    <div class="gp-icon" style="background:#EEF2FF;">🎯</div>
-                    <div class="gp-title">Top Role Matches — Semantic Similarity</div>
+            # Helper function to get match strength label
+            def get_match_strength(score):
+                if score >= 70: return ("Excellent", "#10B981", "#ECFDF5")
+                elif score >= 50: return ("Good", "#6366F1", "#EEF2FF")
+                elif score >= 30: return ("Moderate", "#F59E0B", "#FFF7ED")
+                else: return ("Low", "#EF4444", "#FEF2F2")
+            
+            # Helper function to categorize role
+            def get_role_category(role_name):
+                role_lower = role_name.lower()
+                if any(x in role_lower for x in ["engineer", "developer", "programmer"]):
+                    return ("Engineering", "⚙️", "#3B82F6")
+                elif any(x in role_lower for x in ["analyst", "data", "bi", "scientist"]):
+                    return ("Analytics", "📊", "#8B5CF6")
+                elif any(x in role_lower for x in ["manager", "lead", "director"]):
+                    return ("Leadership", "👔", "#EC4899")
+                elif any(x in role_lower for x in ["designer", "ux", "ui"]):
+                    return ("Design", "🎨", "#F59E0B")
+                else:
+                    return ("General", "💼", "#6B7280")
+            
+            # Featured Top Match Card - Using components.html for SVG support
+            top_match = top_roles[0]
+            top_score = top_match["score"] * 100
+            is_target_top = target_role.lower() == top_match["role_name"].lower()
+            strength_label, strength_color, strength_bg = get_match_strength(top_score)
+            category_name, category_icon, category_color = get_role_category(top_match["role_name"])
+            
+            target_badge_html = '<div style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#ECFDF5,#D1FAE5);color:#065F46;padding:8px 16px;border-radius:8px;font-size:0.9rem;font-weight:700;border:1px solid #A7F3D0;">🎯 Your Target Role</div>' if is_target_top else ''
+            dash_array_top = top_score * 3.77
+            
+            featured_full_html = f'''
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                    body {{ font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: transparent; }}
+                    .featured-card {{
+                        background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+                        border: 2px solid #E2E8F0;
+                        border-radius: 20px;
+                        padding: 2rem;
+                        position: relative;
+                        overflow: hidden;
+                    }}
+                    .featured-card::before {{
+                        content: '';
+                        position: absolute;
+                        top: 0; left: 0; right: 0;
+                        height: 4px;
+                        background: linear-gradient(90deg, #6366F1, #8B5CF6, #A78BFA);
+                    }}
+                    .best-badge {{
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+                        color: #92400E;
+                        padding: 8px 16px;
+                        border-radius: 99px;
+                        font-size: 0.85rem;
+                        font-weight: 700;
+                        margin-bottom: 1.5rem;
+                        border: 1px solid #FCD34D;
+                    }}
+                    .header-row {{
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        gap: 2rem;
+                        flex-wrap: wrap;
+                    }}
+                    .role-info {{ flex: 1; min-width: 280px; }}
+                    .category {{ display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem; font-size: 0.95rem; }}
+                    .role-title {{ font-size: 2rem; font-weight: 800; color: #1F2937; margin: 0 0 1rem 0; line-height: 1.2; }}
+                    .score-ring {{ flex-shrink: 0; }}
+                    .footer-row {{
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        margin-top: 1.5rem;
+                        padding-top: 1.5rem;
+                        border-top: 1px solid #F1F5F9;
+                        flex-wrap: wrap;
+                        gap: 1rem;
+                    }}
+                    .match-badge {{
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        padding: 10px 18px;
+                        border-radius: 12px;
+                        font-size: 0.95rem;
+                        font-weight: 700;
+                    }}
+                    .match-rank {{ font-size: 0.9rem; color: #6B7280; font-weight: 600; }}
+                </style>
+            </head>
+            <body>
+                <div class="featured-card">
+                    <div class="best-badge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="2"/>
+                        </svg>
+                        <span>Best Match</span>
+                    </div>
+                    
+                    <div class="header-row">
+                        <div class="role-info">
+                            <div class="category">
+                                <span style="font-size:1.25rem;">{category_icon}</span>
+                                <span style="color:{category_color};font-weight:600;">{category_name}</span>
+                            </div>
+                            <h2 class="role-title">{top_match["role_name"]}</h2>
+                            {target_badge_html}
+                        </div>
+                        
+                        <div class="score-ring">
+                            <svg width="140" height="140" viewBox="0 0 140 140">
+                                <circle cx="70" cy="70" r="60" fill="none" stroke="#E5E7EB" stroke-width="12"/>
+                                <circle cx="70" cy="70" r="60" fill="none" stroke="{strength_color}" stroke-width="12"
+                                        stroke-dasharray="{dash_array_top} 377" 
+                                        stroke-linecap="round" 
+                                        transform="rotate(-90 70 70)"/>
+                                <text x="70" y="65" text-anchor="middle" font-size="32" font-weight="700" fill="#1F2937">{top_score:.0f}%</text>
+                                <text x="70" y="85" text-anchor="middle" font-size="12" fill="#6B7280">Match Score</text>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-row">
+                        <div class="match-badge" style="background:{strength_bg};color:{strength_color};">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                            </svg>
+                            {strength_label} Match
+                        </div>
+                        <div class="match-rank">#1 of {len(top_roles)} matches</div>
+                    </div>
                 </div>
-            </div>''', unsafe_allow_html=True)
-
-            role_labels = [r["role_name"] for r in top_roles[:10]]
-            role_scores = [r["score"] * 100 for r in top_roles[:10]]
-            st.plotly_chart(
-                make_bar(role_labels[::-1], role_scores[::-1], "", "auto"),
-                use_container_width=True, key="bar_roles",
-            )
-
+            </body>
+            </html>
+            '''
+            components.html(featured_full_html, height=380)
+            
+            # Section Header for Other Matches
+            st.markdown('''
+            <div style="margin: 0.5rem 0 0.75rem 0;">
+                <h3 style="margin: 0; font-size: 1.25rem; font-weight: 600; color: #1F2937;">
+                    More Career Opportunities
+                </h3>
+                <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: #6B7280;">
+                    Explore other roles that match your profile
+                </p>
+            </div>
+            ''', unsafe_allow_html=True)
+            
             st.markdown('<div class="spacer-sm"></div>', unsafe_allow_html=True)
-
-            st.markdown('''
-            <div class="glass-panel">
-                <div class="glass-panel-header">
-                    <div class="gp-icon" style="background:#F0FDFA;">📋</div>
-                    <div class="gp-title">Detailed Match List</div>
+            
+            # Grid of Role Cards (positions 2-9) using components.html
+            roles_to_display = top_roles[1:9]  # Show next 8 roles
+            
+            # Create rows of 4 cards each
+            for row_idx in range(0, len(roles_to_display), 4):
+                cols = st.columns(4, gap="medium")
+                for col_idx, col in enumerate(cols):
+                    role_idx = row_idx + col_idx
+                    if role_idx < len(roles_to_display):
+                        role = roles_to_display[role_idx]
+                        score = role["score"] * 100
+                        rank = role_idx + 2
+                        is_target = target_role.lower() == role["role_name"].lower()
+                        strength_label, strength_color, strength_bg = get_match_strength(score)
+                        category_name, category_icon, category_color = get_role_category(role["role_name"])
+                        
+                        rank_display = "🥈" if rank == 2 else "🥉" if rank == 3 else f"#{rank}"
+                        target_badge = '<div style="display:inline-flex;align-items:center;gap:4px;background:#ECFDF5;color:#065F46;padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:700;border:1px solid #A7F3D0;margin-bottom:8px;">🎯 Target</div>' if is_target else ''
+                        dash_array = score * 1.508
+                        
+                        card_full_html = f'''
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <style>
+                                * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                                body {{ font-family: 'Inter', -apple-system, sans-serif; background: transparent; }}
+                                .card {{
+                                    background: #FFFFFF;
+                                    border: 1px solid #E2E8F0;
+                                    border-radius: 16px;
+                                    padding: 1.2rem;
+                                    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+                                    height: 100%;
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 0.75rem;
+                                }}
+                                .card:hover {{ box-shadow: 0 4px 12px rgba(0,0,0,0.06); }}
+                                .card-header {{
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: space-between;
+                                    gap: 8px;
+                                }}
+                                .rank {{ font-size: 0.9rem; font-weight: 700; color: #94A3B8; }}
+                                .category {{
+                                    display: inline-flex;
+                                    align-items: center;
+                                    gap: 4px;
+                                    padding: 4px 10px;
+                                    border-radius: 6px;
+                                    font-size: 0.75rem;
+                                    font-weight: 700;
+                                }}
+                                .title {{ font-size: 1rem; font-weight: 700; color: #1F2937; line-height: 1.4; }}
+                                .score-area {{
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    gap: 0.5rem;
+                                    margin-top: auto;
+                                    padding-top: 1rem;
+                                    border-top: 1px solid #F1F5F9;
+                                }}
+                                .strength {{ font-size: 0.85rem; font-weight: 700; text-align: center; }}
+                            </style>
+                        </head>
+                        <body>
+                            <div class="card">
+                                <div class="card-header">
+                                    <span class="rank">{rank_display}</span>
+                                    <span class="category" style="background:{category_color}15;color:{category_color};">
+                                        {category_icon} {category_name}
+                                    </span>
+                                </div>
+                                
+                                <div class="title">{role["role_name"]}</div>
+                                {target_badge}
+                                
+                                <div class="score-area">
+                                    <svg width="60" height="60" viewBox="0 0 60 60">
+                                        <circle cx="30" cy="30" r="24" fill="none" stroke="#E5E7EB" stroke-width="6"/>
+                                        <circle cx="30" cy="30" r="24" fill="none" stroke="{strength_color}" stroke-width="6"
+                                                stroke-dasharray="{dash_array} 150.8" 
+                                                stroke-linecap="round" 
+                                                transform="rotate(-90 30 30)"/>
+                                        <text x="30" y="34" text-anchor="middle" font-size="14" font-weight="700" fill="#1F2937">{score:.0f}%</text>
+                                    </svg>
+                                    <div class="strength" style="color:{strength_color};">{strength_label}</div>
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                        '''
+                        with col:
+                            components.html(card_full_html, height=260)
+            
+            # Show remaining count if more than 9 roles
+            if len(top_roles) > 9:
+                remaining = len(top_roles) - 9
+                plural = 's' if remaining > 1 else ''
+                st.markdown(f'''
+                <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:1.2rem;margin-top:1rem;background:#F8FAFC;border:1px dashed #E2E8F0;border-radius:16px;color:#475569;font-size:0.95rem;font-weight:600;">
+                    <span>+{remaining} more role{plural} in your profile</span>
                 </div>
-            </div>''', unsafe_allow_html=True)
-
-            for i, r in enumerate(top_roles[:10]):
-                sc = r["score"] * 100
-                rank = "🥇" if i == 0 else "🥈" if i == 1 else "🥉" if i == 2 else f"#{i+1}"
-                is_target = " &nbsp;⭐ <b>TARGET</b>" if r["role_name"].lower() == target_role.lower() else ""
-                bcls = _badge_cls(sc)
-                st.markdown(
-                    f'<div class="role-row">'
-                    f'<span class="role-rank">{rank}</span>'
-                    f'<span class="badge {bcls}">{sc:.1f}%</span>'
-                    f'<span class="role-name">{r["role_name"]}</span>'
-                    f'{is_target}</div>', unsafe_allow_html=True,
-                )
+                ''', unsafe_allow_html=True)
         else:
             st.info("No role matching data available.")
 
@@ -1327,9 +2212,44 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
                         <div class="gp-title">Section-wise Coverage</div>
                     </div>
                 </div>''', unsafe_allow_html=True)
-                sec_labels = [k.replace("_", " ").title() for k in section_scores]
-                sec_values = [v if isinstance(v, (int, float)) else 0 for v in section_scores.values()]
-                st.plotly_chart(make_bar(sec_labels, sec_values, "", "auto"), use_container_width=True, key="bar_sec")
+                
+                # Properly extract and validate section scores
+                section_mapping = {
+                    "skills": "Skills",
+                    "experience": "Experience",
+                    "education": "Education",
+                    "tools": "Tools",
+                    "certifications": "Certifications",
+                    "projects": "Projects"
+                }
+                
+                # Desired display order
+                section_order = ["skills", "experience", "education", "tools", "certifications", "projects"]
+                
+                # Build filtered and validated data
+                sec_labels = []
+                sec_values = []
+                
+                for section_key in section_order:
+                    if section_key in section_scores:
+                        value = section_scores[section_key]
+                        # Validate and normalize value
+                        if isinstance(value, (int, float)):
+                            # Ensure value is within 0-100 range
+                            normalized_value = max(0, min(100, float(value)))
+                            sec_labels.append(section_mapping.get(section_key, section_key.title()))
+                            sec_values.append(normalized_value)
+                
+                # Only display if we have valid data
+                if sec_labels and sec_values:
+                    st.plotly_chart(
+                        make_bar(sec_labels, sec_values, "", "auto"), 
+                        use_container_width=True, 
+                        key="bar_sec",
+                        config={'displayModeBar': False, 'staticPlot': False, 'responsive': True}
+                    )
+                else:
+                    st.info("No section-wise coverage data available.")
         else:
             st.info("No JD comparison data — paste a job description in the sidebar.")
 
@@ -1572,7 +2492,7 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
         </div>''', unsafe_allow_html=True)
         verdict = explanation.get("verdict", "")
         if verdict:
-            st.markdown(f"**{verdict}**")
+            st.markdown(f'<div style="margin-top: 1.2rem; font-weight: 700; font-size: 1.05rem;">{verdict}</div>', unsafe_allow_html=True)
         detail = explanation.get("detail", explanation.get("reasoning", []))
         if isinstance(detail, list):
             for d in detail:
@@ -1656,14 +2576,393 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
                 <div class="gp-title">Complete Analysis Report</div>
             </div>
         </div>''', unsafe_allow_html=True)
-        st.download_button(
-            label="📥  Download Full Report (JSON)",
-            data=json.dumps(report, indent=2, default=str),
-            file_name=f"talentiq_report_{target_role.replace(' ', '_')}.json",
-            mime="application/json",
-            use_container_width=True,
-        )
+        
         st.markdown('<div class="spacer-sm"></div>', unsafe_allow_html=True)
+        
+        # Download Button
+        col_dl1, col_dl2, col_dl3 = st.columns([1, 1, 1])
+        with col_dl2:
+            st.download_button(
+                label="📥  Download Full Report (JSON)",
+                data=json.dumps(report, indent=2, default=str),
+                file_name=f"talentiq_report_{target_role.replace(' ', '_')}.json",
+                mime="application/json",
+                use_container_width=True,
+            )
+        
+        st.markdown('<div class="spacer-md"></div>', unsafe_allow_html=True)
+        
+        # === REPORT GRID - FIXED LAYOUT ===
+        st.markdown('<div class="report-grid">', unsafe_allow_html=True)
+        
+        # Prepare all data for consistent rendering
+        ats_score_val = ats.get("overall_score", 0)
+        skill_coverage = skill_gap.get("coverage_percent", 0)
+        jd_match = jd_comp.get("overall_match_percent", 0) if jd_comp else 0
+        soft_score_val = soft_skill.get("overall_score", 0)
+        
+        matched_skills = skill_gap.get("matched_skills", [])
+        missing_skills = skill_gap.get("missing_skills", [])
+        top_roles = role_matches.get("top_roles", [])[:5]
+        improvements_list = improvements.get("suggestions", [])[:10]
+        
+        edu_data = profile.get("education", {})
+        exp_data = profile.get("experience", {})
+        degrees = edu_data.get("degrees", []) if isinstance(edu_data, dict) else []
+        max_years = exp_data.get("max_years", 0) if isinstance(exp_data, dict) else 0
+        
+        career_paths = career.get("paths", [])[:5]
+        cert_suggestions = certifications.get("recommended", [])[:8]
+        industry_data = industry.get("alignment_score", 0) if industry else 0
+        
+        # ROW 1: Overview Cards
+        r1c1, r1c2, r1c3, r1c4 = st.columns(4)
+        
+        with r1c1:
+            st.markdown(f'''
+            <div class="report-box">
+                <div class="report-box-header">
+                    <div class="rb-icon" style="background:#EEF2FF;">🎯</div>
+                    <div class="rb-title">ATS Score</div>
+                    <div class="rb-badge badge-{_badge_cls(ats_score_val).replace("badge-", "")}">{_label(ats_score_val)[:4]}</div>
+                </div>
+                <div class="report-box-body">
+                    <div class="rb-metric">
+                        <div class="rb-metric-value">{ats_score_val:.0f}</div>
+                        <div class="rb-metric-unit">/ 100</div>
+                    </div>
+                    <div class="rb-metric-label">Overall ATS Performance</div>
+                    <div class="rb-progress">
+                        <div class="rb-progress-fill" style="width:{ats_score_val}%;background:{_color_for_score(ats_score_val)};"></div>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <div class="rb-stat-row">
+                            <span class="rb-stat-label">Keyword Match</span>
+                            <span class="rb-stat-value">{ats.get("keyword_match", 0):.0f}%</span>
+                        </div>
+                        <div class="rb-stat-row">
+                            <span class="rb-stat-label">Format Score</span>
+                            <span class="rb-stat-value">{ats.get("format_score", 0):.0f}%</span>
+                        </div>
+                        <div class="rb-stat-row">
+                            <span class="rb-stat-label">Structure Score</span>
+                            <span class="rb-stat-value">{ats.get("structure_score", 0):.0f}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>''', unsafe_allow_html=True)
+        
+        with r1c2:
+            st.markdown(f'''
+            <div class="report-box">
+                <div class="report-box-header">
+                    <div class="rb-icon" style="background:#F0FDFA;">🔧</div>
+                    <div class="rb-title">Skills Coverage</div>
+                    <div class="rb-badge" style="background:#ECFDF5;color:#047857;">{len(matched_skills)}</div>
+                </div>
+                <div class="report-box-body">
+                    <div class="rb-metric">
+                        <div class="rb-metric-value">{skill_coverage:.0f}</div>
+                        <div class="rb-metric-unit">%</div>
+                    </div>
+                    <div class="rb-metric-label">Matched Skills Coverage</div>
+                    <div class="rb-progress">
+                        <div class="rb-progress-fill" style="width:{skill_coverage}%;background:{_color_for_score(skill_coverage)};"></div>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <div class="rb-stat-row">
+                            <span class="rb-stat-label">Matched Skills</span>
+                            <span class="rb-stat-value">{len(matched_skills)}</span>
+                        </div>
+                        <div class="rb-stat-row">
+                            <span class="rb-stat-label">Missing Skills</span>
+                            <span class="rb-stat-value" style="color:#DC2626;">{len(missing_skills)}</span>
+                        </div>
+                        <div class="rb-stat-row">
+                            <span class="rb-stat-label">Skill Gap</span>
+                            <span class="rb-stat-value">{100-skill_coverage:.0f}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>''', unsafe_allow_html=True)
+        
+        with r1c3:
+            st.markdown(f'''
+            <div class="report-box">
+                <div class="report-box-header">
+                    <div class="rb-icon" style="background:#FEF3C7;">📋</div>
+                    <div class="rb-title">JD Alignment</div>
+                    <div class="rb-badge badge-{_badge_cls(jd_match).replace("badge-", "")}">{_label(jd_match)[:4]}</div>
+                </div>
+                <div class="report-box-body">
+                    <div class="rb-metric">
+                        <div class="rb-metric-value">{jd_match:.0f}</div>
+                        <div class="rb-metric-unit">%</div>
+                    </div>
+                    <div class="rb-metric-label">Job Description Match</div>
+                    <div class="rb-progress">
+                        <div class="rb-progress-fill" style="width:{jd_match}%;background:{_color_for_score(jd_match)};"></div>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <div class="rb-stat-row">
+                            <span class="rb-stat-label">Matched Keywords</span>
+                            <span class="rb-stat-value">{len(jd_comp.get("matched_keywords", [])) if jd_comp else 0}</span>
+                        </div>
+                        <div class="rb-stat-row">
+                            <span class="rb-stat-label">Missing Keywords</span>
+                            <span class="rb-stat-value" style="color:#DC2626;">{len(jd_comp.get("missing_keywords", [])) if jd_comp else 0}</span>
+                        </div>
+                        <div class="rb-stat-row">
+                            <span class="rb-stat-label">Relevance</span>
+                            <span class="rb-stat-value">{jd_comp.get("relevance_score", 0):.0f}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>''', unsafe_allow_html=True)
+        
+        with r1c4:
+            st.markdown(f'''
+            <div class="report-box">
+                <div class="report-box-header">
+                    <div class="rb-icon" style="background:#FDF2F8;">💡</div>
+                    <div class="rb-title">Profile Summary</div>
+                </div>
+                <div class="report-box-body">
+                    <div class="rb-stat-row">
+                        <span class="rb-stat-label">Experience</span>
+                        <span class="rb-stat-value">{max_years} years</span>
+                    </div>
+                    <div class="rb-stat-row">
+                        <span class="rb-stat-label">Education</span>
+                        <span class="rb-stat-value">{len(degrees)} degree(s)</span>
+                    </div>
+                    <div class="rb-stat-row">
+                        <span class="rb-stat-label">Total Skills</span>
+                        <span class="rb-stat-value">{len(profile.get("skills_normalized", []))}</span>
+                    </div>
+                    <div class="rb-stat-row">
+                        <span class="rb-stat-label">Soft Skills</span>
+                        <span class="rb-stat-value">{soft_score_val:.0f}%</span>
+                    </div>
+                    <div class="rb-stat-row">
+                        <span class="rb-stat-label">Industry Fit</span>
+                        <span class="rb-stat-value">{industry_data:.0f}%</span>
+                    </div>
+                    <div class="rb-stat-row">
+                        <span class="rb-stat-label">Target Role</span>
+                        <span class="rb-stat-value" style="font-size:0.8rem;color:#6366F1;">{target_role[:20]}{"…" if len(target_role)>20 else ""}</span>
+                    </div>
+                </div>
+            </div>''', unsafe_allow_html=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('<div style="margin:1rem 0;"></div>', unsafe_allow_html=True)
+        
+        # ROW 2: Skills & Roles
+        st.markdown('<div class="report-grid">', unsafe_allow_html=True)
+        
+        r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+        
+        with r2c1:
+            matched_html = '<ul class="rb-list">'
+            if matched_skills:
+                for skill in matched_skills[:15]:
+                    matched_html += f'<li class="rb-list-item"><span class="rb-list-dot"></span><span class="rb-list-text">{skill}</span></li>'
+            else:
+                matched_html += '<div class="rb-empty">No matched skills</div>'
+            matched_html += '</ul>'
+            
+            st.markdown(f'''
+            <div class="report-box">
+                <div class="report-box-header">
+                    <div class="rb-icon" style="background:#ECFDF5;">✅</div>
+                    <div class="rb-title">Matched Skills</div>
+                    <div class="rb-badge" style="background:#ECFDF5;color:#047857;">{len(matched_skills)}</div>
+                </div>
+                <div class="report-box-body">
+                    {matched_html}
+                </div>
+            </div>''', unsafe_allow_html=True)
+        
+        with r2c2:
+            missing_html = '<ul class="rb-list">'
+            if missing_skills:
+                for skill in missing_skills[:15]:
+                    skill_name = skill if isinstance(skill, str) else skill.get("skill", "")
+                    missing_html += f'<li class="rb-list-item"><span class="rb-list-dot" style="background:#DC2626;"></span><span class="rb-list-text">{skill_name}</span></li>'
+            else:
+                missing_html += '<div class="rb-empty">No skill gaps detected</div>'
+            missing_html += '</ul>'
+            
+            st.markdown(f'''
+            <div class="report-box">
+                <div class="report-box-header">
+                    <div class="rb-icon" style="background:#FEF2F2;">⚠️</div>
+                    <div class="rb-title">Missing Skills</div>
+                    <div class="rb-badge" style="background:#FEF2F2;color:#DC2626;">{len(missing_skills)}</div>
+                </div>
+                <div class="report-box-body">
+                    {missing_html}
+                </div>
+            </div>''', unsafe_allow_html=True)
+        
+        with r2c3:
+            roles_html = '<ul class="rb-list">'
+            if top_roles:
+                for idx, role in enumerate(top_roles):
+                    score = role.get("score", 0) * 100
+                    role_name = role.get("role_name", "Unknown")
+                    roles_html += f'<li class="rb-list-item"><span class="rb-list-dot"></span><span class="rb-list-text"><b>{role_name}</b> <span style="color:#6366F1;font-weight:700;margin-left:4px;">{score:.0f}%</span></span></li>'
+            else:
+                roles_html += '<div class="rb-empty">No role matches available</div>'
+            roles_html += '</ul>'
+            
+            st.markdown(f'''
+            <div class="report-box">
+                <div class="report-box-header">
+                    <div class="rb-icon" style="background:#EEF2FF;">🎯</div>
+                    <div class="rb-title">Top Role Matches</div>
+                </div>
+                <div class="report-box-body">
+                    {roles_html}
+                </div>
+            </div>''', unsafe_allow_html=True)
+        
+        with r2c4:
+            improvements_html = '<ul class="rb-list">'
+            if improvements_list:
+                for imp in improvements_list[:12]:
+                    msg = imp.get("message", "") if isinstance(imp, dict) else str(imp)
+                    improvements_html += f'<li class="rb-list-item"><span class="rb-list-dot" style="background:#F59E0B;"></span><span class="rb-list-text">{msg[:80]}{"…" if len(msg)>80 else ""}</span></li>'
+            else:
+                improvements_html += '<div class="rb-empty">No improvements suggested</div>'
+            improvements_html += '</ul>'
+            
+            st.markdown(f'''
+            <div class="report-box">
+                <div class="report-box-header">
+                    <div class="rb-icon" style="background:#FFFBEB;">💡</div>
+                    <div class="rb-title">Improvements</div>
+                    <div class="rb-badge" style="background:#FFFBEB;color:#A16207;">{len(improvements_list)}</div>
+                </div>
+                <div class="report-box-body">
+                    {improvements_html}
+                </div>
+            </div>''', unsafe_allow_html=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('<div style="margin:1rem 0;"></div>', unsafe_allow_html=True)
+        
+        # ROW 3: Career & Certifications
+        st.markdown('<div class="report-grid">', unsafe_allow_html=True)
+        
+        r3c1, r3c2, r3c3, r3c4 = st.columns(4)
+        
+        with r3c1:
+            career_html = '<ul class="rb-list">'
+            if career_paths:
+                for path in career_paths:
+                    path_type = path.get("type", "Unknown")
+                    target = path.get("target_role", "")
+                    timeline = path.get("timeline", "")
+                    career_html += f'<li class="rb-list-item"><span class="rb-list-dot"></span><span class="rb-list-text"><b>{target}</b> <span style="color:#94A3B8;font-size:0.8rem;">({timeline})</span></span></li>'
+            else:
+                career_html += '<div class="rb-empty">No career paths available</div>'
+            career_html += '</ul>'
+            
+            st.markdown(f'''
+            <div class="report-box">
+                <div class="report-box-header">
+                    <div class="rb-icon" style="background:#F0F9FF;">📈</div>
+                    <div class="rb-title">Career Paths</div>
+                </div>
+                <div class="report-box-body">
+                    {career_html}
+                </div>
+            </div>''', unsafe_allow_html=True)
+        
+        with r3c2:
+            cert_html = '<ul class="rb-list">'
+            if cert_suggestions:
+                for cert in cert_suggestions:
+                    cert_name = cert.get("name", "") if isinstance(cert, dict) else str(cert)
+                    priority = cert.get("priority", "medium") if isinstance(cert, dict) else "medium"
+                    cert_html += f'<li class="rb-list-item"><span class="rb-list-dot" style="background:#8B5CF6;"></span><span class="rb-list-text">{cert_name}</span></li>'
+            else:
+                cert_html += '<div class="rb-empty">No certifications recommended</div>'
+            cert_html += '</ul>'
+            
+            st.markdown(f'''
+            <div class="report-box">
+                <div class="report-box-header">
+                    <div class="rb-icon" style="background:#FDF4FF;">🏆</div>
+                    <div class="rb-title">Certifications</div>
+                    <div class="rb-badge" style="background:#FDF4FF;color:#A21CAF;">{len(cert_suggestions)}</div>
+                </div>
+                <div class="report-box-body">
+                    {cert_html}
+                </div>
+            </div>''', unsafe_allow_html=True)
+        
+        with r3c3:
+            edu_html = '<ul class="rb-list">'
+            if degrees:
+                for deg in degrees:
+                    edu_html += f'<li class="rb-list-item"><span class="rb-list-dot"></span><span class="rb-list-text">{deg}</span></li>'
+            else:
+                edu_html += '<div class="rb-empty">No education detected</div>'
+            
+            institutions = edu_data.get("institutions", []) if isinstance(edu_data, dict) else []
+            if institutions:
+                edu_html += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-light);"><div style="font-size:0.75rem;font-weight:700;color:#6366F1;margin-bottom:6px;">INSTITUTIONS</div>'
+                for inst in institutions[:3]:
+                    edu_html += f'<li class="rb-list-item" style="font-size:0.82rem;"><span class="rb-list-dot" style="width:4px;height:4px;"></span><span class="rb-list-text">{inst}</span></li>'
+                edu_html += '</div>'
+            edu_html += '</ul>'
+            
+            st.markdown(f'''
+            <div class="report-box">
+                <div class="report-box-header">
+                    <div class="rb-icon" style="background:#EEF2FF;">🎓</div>
+                    <div class="rb-title">Education</div>
+                    <div class="rb-badge" style="background:#EEF2FF;color:#4338CA;">{len(degrees)}</div>
+                </div>
+                <div class="report-box-body">
+                    {edu_html}
+                </div>
+            </div>''', unsafe_allow_html=True)
+        
+        with r3c4:
+            job_titles = exp_data.get("job_titles", []) if isinstance(exp_data, dict) else []
+            exp_html = f'''
+            <div style="text-align:center;padding:20px 0;">
+                <div style="font-size:2.5rem;font-weight:800;color:#F59E0B;line-height:1;">{max_years}</div>
+                <div style="font-size:0.85rem;color:#94A3B8;margin-top:4px;font-weight:600;">YEARS EXPERIENCE</div>
+            </div>
+            <ul class="rb-list" style="margin-top:12px;">'''
+            if job_titles:
+                for title in job_titles[:8]:
+                    exp_html += f'<li class="rb-list-item"><span class="rb-list-dot"></span><span class="rb-list-text">{title}</span></li>'
+            else:
+                exp_html += '<div class="rb-empty">No job titles found</div>'
+            exp_html += '</ul>'
+            
+            st.markdown(f'''
+            <div class="report-box">
+                <div class="report-box-header">
+                    <div class="rb-icon" style="background:#FEF3C7;">💼</div>
+                    <div class="rb-title">Experience</div>
+                </div>
+                <div class="report-box-body">
+                    {exp_html}
+                </div>
+            </div>''', unsafe_allow_html=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        st.markdown('<div class="spacer-lg"></div>', unsafe_allow_html=True)
+        
+        # Raw JSON Expander
         with st.expander("🔍 View Raw JSON Data", expanded=False):
             st.json(report)
 

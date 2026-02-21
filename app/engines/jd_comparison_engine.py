@@ -173,57 +173,125 @@ class JDComparisonEngine:
     ) -> dict:
         sections: dict = {}
 
-        # Skills
-        skill_patterns = [
-            r"python", r"java\b", r"javascript", r"typescript", r"react",
-            r"node\.?js", r"docker", r"kubernetes", r"aws", r"sql",
-            r"linux", r"git", r"agile", r"scrum", r"rest\s*api",
-            r"machine\s*learning", r"deep\s*learning", r"tensorflow",
-            r"pytorch", r"html", r"css", r"angular", r"vue",
-            r"mongodb", r"postgresql", r"redis", r"kafka",
-            r"terraform", r"ci/?cd", r"microservices",
-        ]
-        jd_skill_count = sum(1 for p in skill_patterns if re.search(p, jd_lower))
-        resume_skill_count = sum(1 for p in skill_patterns if re.search(p, resume_lower))
-        skill_match = (
-            min(resume_skill_count / jd_skill_count * 100, 100)
-            if jd_skill_count > 0
-            else (100.0 if resume_skill_count > 0 else 50.0)
-        )
+        # Skills - Use actual extracted skills instead of hardcoded patterns
+        if resume_skills:
+            # Convert resume skills to lowercase for matching
+            resume_skills_lower = [s.lower().strip() for s in resume_skills]
+            
+            # Extract skill-like terms from JD (technical keywords)
+            skill_patterns = [
+                r"\b(python|java|javascript|typescript|c\+\+|c#|ruby|php|go|rust|swift|kotlin)\b",
+                r"\b(react|angular|vue|node\.?js|express|django|flask|spring|laravel)\b",
+                r"\b(docker|kubernetes|aws|azure|gcp|terraform|ansible|jenkins)\b",
+                r"\b(sql|mysql|postgresql|mongodb|redis|elasticsearch|cassandra)\b",
+                r"\b(git|jira|confluence|slack|agile|scrum|ci/?cd|devops)\b",
+                r"\b(machine\s*learning|deep\s*learning|nlp|computer\s*vision|ai)\b",
+                r"\b(tensorflow|pytorch|scikit-learn|pandas|numpy|spark)\b",
+                r"\b(html|css|sass|less|bootstrap|tailwind)\b",
+                r"\b(rest\s*api|graphql|microservices|websockets|grpc)\b",
+            ]
+            
+            jd_required_skills = set()
+            for pattern in skill_patterns:
+                matches = re.finditer(pattern, jd_lower)
+                for match in matches:
+                    jd_required_skills.add(match.group().strip())
+            
+            if jd_required_skills:
+                # Count how many JD skills are covered by resume
+                matched_skills = 0
+                for jd_skill in jd_required_skills:
+                    # Check if JD skill is in resume skills or resume text
+                    if any(jd_skill in rs for rs in resume_skills_lower) or jd_skill in resume_lower:
+                        matched_skills += 1
+                
+                skill_match = (matched_skills / len(jd_required_skills)) * 100
+            else:
+                # If JD has no clear technical skills, check general coverage
+                skill_match = 70.0 if len(resume_skills) > 5 else 50.0
+        else:
+            # Fallback to basic keyword matching if no skills extracted
+            skill_match = 50.0
+        
         sections["skills"] = {"relevance_percent": round(skill_match, 1)}
 
-        # Experience
+        # Experience - More nuanced scoring
         exp_jd = self._extract_years(jd_lower)
         exp_resume = self._extract_years(resume_lower)
-        if exp_jd > 0:
-            exp_match = min(exp_resume / exp_jd * 100, 100) if exp_resume > 0 else 30.0
+        
+        if exp_jd > 0 and exp_resume > 0:
+            # Calculate percentage, cap at 100%
+            ratio = exp_resume / exp_jd
+            if ratio >= 1.0:
+                exp_match = 100.0
+            elif ratio >= 0.8:
+                exp_match = 90.0
+            elif ratio >= 0.6:
+                exp_match = 75.0
+            elif ratio >= 0.4:
+                exp_match = 50.0
+            else:
+                exp_match = 30.0
+        elif exp_jd == 0 and exp_resume > 0:
+            # JD doesn't specify experience, but resume has it
+            exp_match = 85.0
+        elif exp_jd > 0 and exp_resume == 0:
+            # JD requires experience, resume has none
+            exp_match = 20.0
         else:
-            exp_match = 80.0
+            # Both have no specific years mentioned
+            exp_match = 60.0
+        
         sections["experience"] = {
             "relevance_percent": round(exp_match, 1),
             "jd_years": exp_jd,
             "resume_years": exp_resume,
         }
 
-        # Education
+        # Education - More accurate matching
         edu_keywords = [
-            "bachelor", "master", "phd", "b.tech", "m.tech", "b.e", "m.e",
-            "b.s", "m.s", "mba", "bca", "mca", "diploma", "degree",
+            "bachelor", "master", "phd", "doctorate", "b.tech", "m.tech", 
+            "b.e", "m.e", "b.s", "m.s", "mba", "bca", "mca", 
+            "diploma", "degree", "certification"
         ]
-        jd_edu = sum(1 for k in edu_keywords if k in jd_lower)
-        resume_edu = sum(1 for k in edu_keywords if k in resume_lower)
-        edu_match = min(resume_edu / jd_edu * 100, 100) if jd_edu > 0 else 80.0
+        
+        jd_edu_found = [k for k in edu_keywords if k in jd_lower]
+        resume_edu_found = [k for k in edu_keywords if k in resume_lower]
+        
+        if jd_edu_found:
+            # Check how many JD education requirements are met
+            matched_edu = sum(1 for jd_e in jd_edu_found if jd_e in resume_lower)
+            edu_match = (matched_edu / len(jd_edu_found)) * 100
+        else:
+            # JD doesn't specify education
+            edu_match = 75.0 if resume_edu_found else 60.0
+        
         sections["education"] = {"relevance_percent": round(edu_match, 1)}
 
-        # Tools
+        # Tools - Check JD requirements vs resume tools
         tool_keywords = [
-            "git", "jira", "docker", "jenkins", "terraform", "ansible",
-            "webpack", "figma", "postman", "swagger", "confluence",
-            "slack", "vscode", "vim", "linux",
+            "git", "github", "gitlab", "bitbucket",
+            "jira", "confluence", "asana", "trello",
+            "docker", "kubernetes", "jenkins", "circleci", "travis",
+            "terraform", "ansible", "puppet", "chef",
+            "webpack", "babel", "vite", "rollup",
+            "figma", "sketch", "adobe xd",
+            "postman", "swagger", "insomnia",
+            "vscode", "intellij", "pycharm", "vim", "emacs",
+            "linux", "unix", "bash", "powershell"
         ]
-        jd_tools = sum(1 for k in tool_keywords if k in jd_lower)
-        resume_tools = sum(1 for k in tool_keywords if k in resume_lower)
-        tool_match = min(resume_tools / jd_tools * 100, 100) if jd_tools > 0 else 80.0
+        
+        jd_tools_found = [t for t in tool_keywords if t in jd_lower]
+        resume_tools_found = [t for t in tool_keywords if t in resume_lower]
+        
+        if jd_tools_found:
+            # Check how many JD tools are in resume
+            matched_tools = sum(1 for jd_t in jd_tools_found if jd_t in resume_lower)
+            tool_match = (matched_tools / len(jd_tools_found)) * 100
+        else:
+            # JD doesn't specify tools
+            tool_match = 70.0 if resume_tools_found else 65.0
+        
         sections["tools"] = {"relevance_percent": round(tool_match, 1)}
 
         return sections
