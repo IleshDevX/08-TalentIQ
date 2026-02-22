@@ -276,7 +276,7 @@ Text Extraction ──► Preprocessing ──► Information Extraction
 Resume Embedding                    Skill Normalization
     │                                        │
     ▼                                        │
-FAISS Vector Search ◄───────────────────────┘
+FAISS Vector Search ◄────────────────────────┘
     │
     ▼
 Semantic Role Matching (Hybrid 4-Factor Scoring)
