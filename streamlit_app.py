@@ -917,6 +917,7 @@ button[kind="header"] { visibility: visible !important; }
     border-radius: var(--radius-md); padding: 4px;
     border: 1px solid var(--border);
     box-shadow: var(--shadow-sm); overflow-x: auto;
+    justify-content: center;
 }
 .stTabs [data-baseweb="tab"] {
     height: 46px; border-radius: var(--radius-sm);
