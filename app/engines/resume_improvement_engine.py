@@ -170,9 +170,26 @@ class ResumeImprovementEngine:
                     "impact": "Shows senior-level technical leadership and strategic thinking",
                 })
             
-            # Calculate improvement score (100 - penalty per issue)
+            # Calculate improvement score with generous base scoring
             issue_count = len(suggestions)
-            improvement_score = max(100 - (issue_count * 8), 0)  # -8 points per issue
+            
+            # Base score starts at 85, with smaller penalty per issue
+            # High priority issues: -4 points, Medium priority: -2 points
+            high_priority_count = sum(1 for s in suggestions if s.get("priority") == "high")
+            medium_priority_count = sum(1 for s in suggestions if s.get("priority") == "medium")
+            
+            penalty = (high_priority_count * 4) + (medium_priority_count * 2)
+            improvement_score = max(85 - penalty, 55)  # Floor at 55, starts at 85
+            
+            # Bonus points for good traits
+            if self._has_sufficient_metrics(text):
+                improvement_score += 5
+            if self._detect_passive_voice(text) <= 1:
+                improvement_score += 5
+            if not weak_verbs:
+                improvement_score += 5
+            
+            improvement_score = min(improvement_score, 100)  # Cap at 100
             
             return {
                 "suggestions": suggestions[:10],  # Top 10 most impactful

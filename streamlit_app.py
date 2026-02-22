@@ -22,6 +22,7 @@ import json
 import plotly.graph_objects as go
 import time
 import math
+import html
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Configuration
@@ -174,20 +175,60 @@ button[kind="header"] { visibility: visible !important; }
 
 /* ─── Score Ring (CSS only) ────────────────────────────────────────── */
 .ring-row {
-    display: flex; gap: 16px; flex-wrap: wrap;
-    justify-content: center; margin: 0.6rem 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 0.6rem 0;
 }
 .ring-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: 1rem 1.2rem;
-    flex: 1 1 170px; max-width: 220px;
     text-align: center;
     box-shadow: var(--shadow-sm);
     transition: var(--transition);
     position: relative; overflow: hidden;
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
+/* Bottom KPI row - equal height cards */
+.kpi-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 0.6rem 0;
+}
+.kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem 1rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    position: relative; overflow: hidden;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glow);
+    border-color: #C7D2FE;
+}
+.kpi-card::after {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+}
+.kpi-card.kc-green::after   { background: linear-gradient(90deg,#10B981,#34D399); }
+.kpi-card.kc-coral::after   { background: linear-gradient(90deg,#F87171,#FCA5A5); }
+.kpi-card.kc-amber::after   { background: linear-gradient(90deg,#F59E0B,#FBBF24); }
 .ring-card:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-glow);
@@ -428,188 +469,7 @@ button[kind="header"] { visibility: visible !important; }
     margin-top: 8px;
 }
 
-/* ─── Report Grid (Fixed Layout) ────────────────────────────────────── */
-.report-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin: 1rem 0;
-}
-@media (max-width: 1400px) {
-    .report-grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 1024px) {
-    .report-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 640px) {
-    .report-grid { grid-template-columns: 1fr; }
-}
-
-.report-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 0;
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-    display: flex;
-    flex-direction: column;
-    height: 280px;
-    overflow: hidden;
-    position: relative;
-}
-.report-box:hover {
-    box-shadow: var(--shadow-md);
-    border-color: #C7D2FE;
-}
-.report-box-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 1rem 1.1rem;
-    border-bottom: 1px solid var(--border-light);
-    background: linear-gradient(to bottom, var(--surface) 0%, var(--surface-alt) 100%);
-    flex-shrink: 0;
-}
-.rb-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-}
-.rb-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0;
-    line-height: 1.2;
-    flex: 1;
-}
-.rb-badge {
-    font-size: 0.8rem;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 6px;
-    flex-shrink: 0;
-}
-.report-box-body {
-    padding: 1rem 1.1rem;
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: #CBD5E1 #F1F5F9;
-}
-.report-box-body::-webkit-scrollbar {
-    width: 6px;
-}
-.report-box-body::-webkit-scrollbar-track {
-    background: #F1F5F9;
-    border-radius: 10px;
-}
-.report-box-body::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
-    border-radius: 10px;
-}
-.report-box-body::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
-}
-.rb-metric {
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-    margin-bottom: 8px;
-}
-.rb-metric-value {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--primary);
-    line-height: 1;
-}
-.rb-metric-unit {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    font-weight: 600;
-}
-.rb-metric-label {
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-    margin-bottom: 12px;
-}
-.rb-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.rb-list-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 6px 0;
-    font-size: 0.88rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    border-bottom: 1px solid var(--border-light);
-}
-.rb-list-item:last-child {
-    border-bottom: none;
-}
-.rb-list-dot {
-    width: 5px;
-    height: 5px;
-    background: var(--primary);
-    border-radius: 50%;
-    margin-top: 7px;
-    flex-shrink: 0;
-}
-.rb-list-text {
-    flex: 1;
-    word-wrap: break-word;
-}
-.rb-empty {
-    color: var(--text-muted);
-    font-style: italic;
-    text-align: center;
-    padding: 40px 10px;
-    font-size: 0.88rem;
-}
-.rb-stat-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border-light);
-}
-.rb-stat-row:last-child {
-    border-bottom: none;
-}
-.rb-stat-label {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-.rb-stat-value {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-.rb-progress {
-    width: 100%;
-    height: 6px;
-    background: #F1F5F9;
-    border-radius: 99px;
-    overflow: hidden;
-    margin: 8px 0;
-}
-.rb-progress-fill {
-    height: 100%;
-    border-radius: 99px;
-    transition: width 0.8s ease;
-}
+/* ─── Report Section (rendered via components.html) ─────────────────── */
 
 /* ─── Chips ────────────────────────────────────────────────────────── */
 .chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -714,24 +574,271 @@ button[kind="header"] { visibility: visible !important; }
 .ck-pass { color: #047857; }
 .ck-fail { color: #DC2626; }
 
-/* ─── Timeline ─────────────────────────────────────────────────────── */
-.tl-item {
-    display: flex; align-items: flex-start; gap: 14px;
-    padding: 0.7rem 0; border-left: 2px solid var(--border);
-    margin-left: 10px; padding-left: 20px; position: relative;
+/* ─── Role Match v5 — Redesign ─────────────────────────────────────── */
+/* Hero Card */
+.rm-hero {
+    position: relative;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 50%, #EEF2FF 100%);
+    border: 1.5px solid #E0E7FF;
+    border-radius: var(--radius-xl);
+    padding: 2rem 2.2rem;
+    overflow: hidden;
+    margin-bottom: 1.2rem;
 }
-.tl-item::before {
-    content: ''; position: absolute;
-    left: -7px; top: 1.2rem;
-    width: 12px; height: 12px; border-radius: 50%;
-    border: 2.5px solid var(--primary); background: white;
+.rm-hero::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, #6366F1, #8B5CF6, #EC4899);
 }
-.tl-item.tl-promo::before  { border-color: var(--success); background: var(--success-bg); }
-.tl-item.tl-lat::before    { border-color: #3B82F6; background: #EFF6FF; }
-.tl-item.tl-pivot::before  { border-color: var(--warning); background: var(--warning-bg); }
-.tl-body { flex: 1; }
-.tl-from { font-size: 0.92rem; color: var(--text-muted); font-weight: 500; }
-.tl-to { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 3px 0 6px 0; }
+.rm-hero::after {
+    content: '';
+    position: absolute; top: -80px; right: -60px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%);
+    border-radius: 50%; pointer-events: none;
+}
+.rm-hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+    color: #92400E; padding: 6px 16px; border-radius: 99px;
+    font-size: 0.82rem; font-weight: 700; border: 1px solid #FCD34D;
+    margin-bottom: 1.2rem;
+}
+.rm-hero-body {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 2rem; flex-wrap: wrap; position: relative; z-index: 1;
+}
+.rm-hero-info { flex: 1; min-width: 260px; }
+.rm-hero-cat {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.82rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 0.5rem;
+}
+.rm-hero-role {
+    font-size: 1.9rem; font-weight: 900; color: var(--text-primary);
+    line-height: 1.15; margin: 0 0 1rem 0;
+    letter-spacing: -0.3px;
+}
+.rm-hero-target {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #ECFDF5; color: #065F46;
+    padding: 6px 14px; border-radius: 8px;
+    font-size: 0.82rem; font-weight: 700; border: 1px solid #A7F3D0;
+}
+.rm-hero-score {
+    flex-shrink: 0; text-align: center;
+}
+.rm-hero-pct {
+    font-size: 3.2rem; font-weight: 900; line-height: 1;
+    background: linear-gradient(135deg, #4F46E5, #7C3AED);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.rm-hero-pct-label {
+    font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
+    margin-top: 4px;
+}
+.rm-hero-breakdown {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin-top: 1.5rem; padding-top: 1.5rem;
+    border-top: 1px solid var(--border-light);
+    position: relative; z-index: 1;
+}
+.rm-bd-item { text-align: center; }
+.rm-bd-val {
+    font-size: 1.2rem; font-weight: 800; line-height: 1;
+}
+.rm-bd-label {
+    font-size: 0.72rem; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.4px; margin-top: 4px;
+}
+.rm-bd-bar {
+    height: 4px; background: #F1F5F9; border-radius: 99px;
+    margin-top: 6px; overflow: hidden;
+}
+.rm-bd-fill {
+    height: 100%; border-radius: 99px;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+}
+.rm-hero-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 1rem; padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+    position: relative; z-index: 1;
+}
+.rm-strength-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px; border-radius: 8px;
+    font-size: 0.88rem; font-weight: 700;
+}
+.rm-rank-label {
+    font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
+}
+
+/* Sub Header */
+.rm-sub-header {
+    margin: 0.2rem 0 0.8rem 0;
+}
+.rm-sub-title {
+    font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;
+}
+.rm-sub-desc {
+    font-size: 0.82rem; color: var(--text-muted); margin: 2px 0 0 0;
+}
+
+/* Role Cards Grid */
+.rm-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+.rm-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem 1.3rem;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-height: 200px;
+}
+.rm-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glow);
+    border-color: #C7D2FE;
+}
+.rm-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--primary-light), var(--secondary));
+    opacity: 0; transition: opacity 0.3s;
+}
+.rm-card:hover::before { opacity: 1; }
+.rm-card-top {
+    display: flex; align-items: center; justify-content: space-between;
+}
+.rm-card-rank {
+    font-size: 0.82rem; font-weight: 800; color: var(--text-muted);
+    background: var(--surface-alt); padding: 3px 10px; border-radius: 6px;
+}
+.rm-card-cat {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 6px;
+    font-size: 0.72rem; font-weight: 700;
+}
+.rm-card-role {
+    font-size: 1.05rem; font-weight: 700; color: var(--text-primary);
+    line-height: 1.35; margin: 0;
+}
+.rm-card-target-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #ECFDF5; color: #065F46;
+    padding: 3px 10px; border-radius: 6px;
+    font-size: 0.72rem; font-weight: 700; border: 1px solid #A7F3D0;
+}
+.rm-card-score-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-top: auto; padding-top: 0.7rem;
+    border-top: 1px solid var(--border-light);
+}
+.rm-card-pct {
+    font-size: 1.5rem; font-weight: 900;
+    line-height: 1; min-width: 55px;
+}
+.rm-card-bar-wrap { flex: 1; }
+.rm-card-bar-track {
+    height: 8px; background: #F1F5F9; border-radius: 99px;
+    overflow: hidden;
+}
+.rm-card-bar-fill {
+    height: 100%; border-radius: 99px;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+}
+.rm-card-strength {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.3px; margin-top: 4px;
+}
+/* Mini breakdown row inside card */
+.rm-card-bd {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 6px; margin-top: 0.3rem;
+}
+.rm-card-bd-item { text-align: center; }
+.rm-card-bd-val {
+    font-size: 0.78rem; font-weight: 800; line-height: 1;
+}
+.rm-card-bd-label {
+    font-size: 0.62rem; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.3px;
+}
+.rm-card-bd-bar {
+    height: 3px; background: #F1F5F9; border-radius: 99px;
+    margin-top: 3px; overflow: hidden;
+}
+.rm-card-bd-fill {
+    height: 100%; border-radius: 99px;
+}
+/* More roles pill */
+.rm-more {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 1rem; margin-top: 0.8rem;
+    background: var(--surface-alt); border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    color: var(--text-muted); font-size: 0.9rem; font-weight: 600;
+}
+
+/* ─── Career Path Timeline ─────────────────────────────────────────── */
+.cp-container {
+    background: white; border: 1px solid #E2E8F0; border-radius: 14px;
+    padding: 24px 28px; margin-top: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.cp-item {
+    display: flex; gap: 18px; margin-bottom: 28px; position: relative;
+}
+.cp-item.cp-last { margin-bottom: 0; }
+
+.cp-timeline {
+    position: relative; display: flex; flex-direction: column; align-items: center;
+    width: 20px; flex-shrink: 0;
+}
+.cp-node {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #FFFFFF; border: 3px solid #6366F1;
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.12);
+    z-index: 2;
+}
+.cp-line {
+    position: absolute; top: 14px; left: 50%;
+    transform: translateX(-50%);
+    width: 2px; height: calc(100% + 28px);
+    background: linear-gradient(180deg, #C7D2FE 0%, #E0E7FF 100%);
+}
+
+.cp-content { flex: 1; }
+.cp-from {
+    font-size: 0.75rem; font-weight: 600; color: #94A3B8;
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;
+}
+.cp-to {
+    font-size: 1.15rem; font-weight: 700; color: #0F172A;
+    margin-bottom: 10px; line-height: 1.3;
+}
+.cp-meta {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.cp-badge {
+    display: inline-block; padding: 5px 12px; border-radius: 6px;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.4px;
+}
+.cp-badge-green { background: #D1FAE5; color: #065F46; }
+.cp-badge-blue { background: #DBEAFE; color: #1E40AF; }
+.cp-badge-orange { background: #FED7AA; color: #9A3412; }
+.cp-overlap {
+    font-size: 0.78rem; color: #64748B; font-weight: 500;
+}
 
 /* ─── Action Cards ─────────────────────────────────────────────────── */
 .act-card {
@@ -947,12 +1054,23 @@ p, li, span { font-family: 'Inter', sans-serif !important; }
 .spacer-lg { height: 1.2rem; }
 
 /* ─── Responsive ───────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .ring-row { grid-template-columns: repeat(3, 1fr); }
+    .kpi-row { grid-template-columns: repeat(3, 1fr); }
+}
 @media (max-width: 768px) {
     .top-banner { padding: 1rem; border-radius: var(--radius-md); flex-wrap: wrap; gap: 10px; }
     .banner-right { flex-wrap: wrap; }
     .block-container { padding: 0.8rem 1rem 2rem 1rem !important; }
-    .ring-card { max-width: 100%; }
+    .ring-row { grid-template-columns: repeat(2, 1fr); }
+    .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    .ring-card { min-height: 140px; }
+    .kpi-card { min-height: 100px; }
     .bd-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+    .ring-row { grid-template-columns: repeat(2, 1fr); }
+    .kpi-row { grid-template-columns: 1fr; }
 }
 
 /* ─── Role Matches Redesign ───────────────────────────────────────── */
@@ -1639,44 +1757,27 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
     improvement_score = improvements.get("improvement_score", 0)
 
     # ══════════════════════════════════════════════════════════════
-    #  SCORE RING STRIP — compact horizontal KPI row
+    # Pipeline + Target + Quality KPIs (above tabs)
     # ══════════════════════════════════════════════════════════════
-
-    rings = [
-        (ats_score_val, "ATS Score",    _label(ats_score_val),    _clr(ats_score_val),    "rc-indigo"),
-        (coverage_pct,  "Skill Match",  f"{len(skill_gap.get('matched_skills',[]))} found",  _clr(coverage_pct),  "rc-teal"),
-        (jd_match_pct,  "JD Alignment", _label(jd_match_pct),     _clr(jd_match_pct),     "rc-blue"),
-        (ats_sim_score, "ATS Sim",      _label(ats_sim_score),    _clr(ats_sim_score),    "rc-purple"),
-        (soft_score,    "Soft Skills",  _label(soft_score),       _clr(soft_score),       "rc-green"),
-        (industry_score,"Industry",     _label(industry_score),   _clr(industry_score),   "rc-amber"),
-    ]
-    ring_cards = "".join(render_ring_card(p, l, s, c, a) for p, l, s, c, a in rings)
-    st.markdown(f'<div class="ring-row anim-up">{ring_cards}</div>', unsafe_allow_html=True)
-
-    # Pipeline + Target meta row
-    mt1, mt2, mt3 = st.columns(3)
-    with mt1:
-        st.markdown(f'''
-        <div class="ring-card rc-green" style="max-width:100%;text-align:center;">
+    display_role = target_role if len(target_role) <= 22 else target_role[:20] + "…"
+    st.markdown(f'''
+    <div class="kpi-row anim-up">
+        <div class="kpi-card kc-green">
             <div style="font-size:2rem;font-weight:800;color:#10B981;margin-bottom:4px;">{pipeline_time:.1f}s</div>
             <div class="ring-label">Pipeline Time</div>
             <div class="ring-sub">{engines_count} engines executed</div>
-        </div>''', unsafe_allow_html=True)
-    with mt2:
-        display_role = target_role if len(target_role) <= 22 else target_role[:20] + "…"
-        st.markdown(f'''
-        <div class="ring-card rc-coral" style="max-width:100%;text-align:center;">
+        </div>
+        <div class="kpi-card kc-coral">
             <div style="font-size:1.4rem;font-weight:800;color:#F87171;margin-bottom:4px;">{display_role}</div>
             <div class="ring-label">Target Role</div>
             <div class="ring-sub">{jd_source.replace("_"," ").title()}</div>
-        </div>''', unsafe_allow_html=True)
-    with mt3:
-        st.markdown(f'''
-        <div class="ring-card rc-amber" style="max-width:100%;text-align:center;">
+        </div>
+        <div class="kpi-card kc-amber">
             <div style="font-size:2rem;font-weight:800;color:#F59E0B;margin-bottom:4px;">{improvement_score:.0f}<span style="font-size:1.05rem;color:#94A3B8;">/100</span></div>
             <div class="ring-label">Resume Quality</div>
             <div class="ring-sub">{_label(improvement_score)}</div>
-        </div>''', unsafe_allow_html=True)
+        </div>
+    </div>''', unsafe_allow_html=True)
 
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
@@ -1698,6 +1799,22 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
     # TAB 1 — Overview
     # ─────────────────────────────────────────────────────────
     with tabs[0]:
+        # ══════════════════════════════════════════════════════════════
+        #  SCORE RING STRIP — 3x2 KPI grid at top of Overview
+        # ══════════════════════════════════════════════════════════════
+        rings = [
+            (ats_score_val, "ATS Score",    _label(ats_score_val),    _clr(ats_score_val),    "rc-indigo"),
+            (coverage_pct,  "Skill Match",  f"{len(skill_gap.get('matched_skills',[]))} found",  _clr(coverage_pct),  "rc-teal"),
+            (jd_match_pct,  "JD Alignment", _label(jd_match_pct),     _clr(jd_match_pct),     "rc-blue"),
+            (ats_sim_score, "ATS Sim",      _label(ats_sim_score),    _clr(ats_sim_score),    "rc-purple"),
+            (soft_score,    "Soft Skills",  _label(soft_score),       _clr(soft_score),       "rc-green"),
+            (industry_score,"Industry",     _label(industry_score),   _clr(industry_score),   "rc-amber"),
+        ]
+        ring_cards = "".join(render_ring_card(p, l, s, c, a) for p, l, s, c, a in rings)
+        st.markdown(f'<div class="ring-row anim-up">{ring_cards}</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="spacer-md"></div>', unsafe_allow_html=True)
+
         ov_l, ov_r = st.columns([1, 1], gap="medium")
 
         # Left: Radar + Gauges
@@ -1881,279 +1998,130 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ─────────────────────────────────────────────────────────
-    # TAB 2 — Role Matching (Complete Redesign)
+    # TAB 2 — Role Matching (v5 Redesign — Pure Markdown)
     # ─────────────────────────────────────────────────────────
     with tabs[1]:
         top_roles = role_matches.get("top_roles", [])
         if top_roles:
-            # Helper function to get match strength label
-            def get_match_strength(score):
+            # ── Helpers ──
+            def _match_strength(score):
                 if score >= 70: return ("Excellent", "#10B981", "#ECFDF5")
-                elif score >= 50: return ("Good", "#6366F1", "#EEF2FF")
-                elif score >= 30: return ("Moderate", "#F59E0B", "#FFF7ED")
-                else: return ("Low", "#EF4444", "#FEF2F2")
-            
-            # Helper function to categorize role
-            def get_role_category(role_name):
-                role_lower = role_name.lower()
-                if any(x in role_lower for x in ["engineer", "developer", "programmer"]):
+                if score >= 50: return ("Good", "#6366F1", "#EEF2FF")
+                if score >= 30: return ("Moderate", "#F59E0B", "#FFF7ED")
+                return ("Low", "#EF4444", "#FEF2F2")
+
+            def _role_cat(name):
+                lo = name.lower()
+                if any(x in lo for x in ["engineer", "developer", "programmer", "architect"]):
                     return ("Engineering", "⚙️", "#3B82F6")
-                elif any(x in role_lower for x in ["analyst", "data", "bi", "scientist"]):
+                if any(x in lo for x in ["analyst", "data", "bi", "scientist", "ml", "ai"]):
                     return ("Analytics", "📊", "#8B5CF6")
-                elif any(x in role_lower for x in ["manager", "lead", "director"]):
+                if any(x in lo for x in ["manager", "lead", "director", "head"]):
                     return ("Leadership", "👔", "#EC4899")
-                elif any(x in role_lower for x in ["designer", "ux", "ui"]):
+                if any(x in lo for x in ["designer", "ux", "ui", "creative"]):
                     return ("Design", "🎨", "#F59E0B")
-                else:
-                    return ("General", "💼", "#6B7280")
-            
-            # Featured Top Match Card - Using components.html for SVG support
-            top_match = top_roles[0]
-            top_score = top_match["score"] * 100
-            is_target_top = target_role.lower() == top_match["role_name"].lower()
-            strength_label, strength_color, strength_bg = get_match_strength(top_score)
-            category_name, category_icon, category_color = get_role_category(top_match["role_name"])
-            
-            target_badge_html = '<div style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#ECFDF5,#D1FAE5);color:#065F46;padding:8px 16px;border-radius:8px;font-size:0.9rem;font-weight:700;border:1px solid #A7F3D0;">🎯 Your Target Role</div>' if is_target_top else ''
-            dash_array_top = top_score * 3.77
-            
-            featured_full_html = f'''
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-                    body {{ font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: transparent; }}
-                    .featured-card {{
-                        background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
-                        border: 2px solid #E2E8F0;
-                        border-radius: 20px;
-                        padding: 2rem;
-                        position: relative;
-                        overflow: hidden;
-                    }}
-                    .featured-card::before {{
-                        content: '';
-                        position: absolute;
-                        top: 0; left: 0; right: 0;
-                        height: 4px;
-                        background: linear-gradient(90deg, #6366F1, #8B5CF6, #A78BFA);
-                    }}
-                    .best-badge {{
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 8px;
-                        background: linear-gradient(135deg, #FEF3C7, #FDE68A);
-                        color: #92400E;
-                        padding: 8px 16px;
-                        border-radius: 99px;
-                        font-size: 0.85rem;
-                        font-weight: 700;
-                        margin-bottom: 1.5rem;
-                        border: 1px solid #FCD34D;
-                    }}
-                    .header-row {{
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        gap: 2rem;
-                        flex-wrap: wrap;
-                    }}
-                    .role-info {{ flex: 1; min-width: 280px; }}
-                    .category {{ display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem; font-size: 0.95rem; }}
-                    .role-title {{ font-size: 2rem; font-weight: 800; color: #1F2937; margin: 0 0 1rem 0; line-height: 1.2; }}
-                    .score-ring {{ flex-shrink: 0; }}
-                    .footer-row {{
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        margin-top: 1.5rem;
-                        padding-top: 1.5rem;
-                        border-top: 1px solid #F1F5F9;
-                        flex-wrap: wrap;
-                        gap: 1rem;
-                    }}
-                    .match-badge {{
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 8px;
-                        padding: 10px 18px;
-                        border-radius: 12px;
-                        font-size: 0.95rem;
-                        font-weight: 700;
-                    }}
-                    .match-rank {{ font-size: 0.9rem; color: #6B7280; font-weight: 600; }}
-                </style>
-            </head>
-            <body>
-                <div class="featured-card">
-                    <div class="best-badge">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#F59E0B" stroke="#F59E0B" stroke-width="2"/>
-                        </svg>
-                        <span>Best Match</span>
-                    </div>
-                    
-                    <div class="header-row">
-                        <div class="role-info">
-                            <div class="category">
-                                <span style="font-size:1.25rem;">{category_icon}</span>
-                                <span style="color:{category_color};font-weight:600;">{category_name}</span>
-                            </div>
-                            <h2 class="role-title">{top_match["role_name"]}</h2>
-                            {target_badge_html}
-                        </div>
-                        
-                        <div class="score-ring">
-                            <svg width="140" height="140" viewBox="0 0 140 140">
-                                <circle cx="70" cy="70" r="60" fill="none" stroke="#E5E7EB" stroke-width="12"/>
-                                <circle cx="70" cy="70" r="60" fill="none" stroke="{strength_color}" stroke-width="12"
-                                        stroke-dasharray="{dash_array_top} 377" 
-                                        stroke-linecap="round" 
-                                        transform="rotate(-90 70 70)"/>
-                                <text x="70" y="65" text-anchor="middle" font-size="32" font-weight="700" fill="#1F2937">{top_score:.0f}%</text>
-                                <text x="70" y="85" text-anchor="middle" font-size="12" fill="#6B7280">Match Score</text>
-                            </svg>
-                        </div>
-                    </div>
-                    
-                    <div class="footer-row">
-                        <div class="match-badge" style="background:{strength_bg};color:{strength_color};">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
-                            </svg>
-                            {strength_label} Match
-                        </div>
-                        <div class="match-rank">#1 of {len(top_roles)} matches</div>
-                    </div>
-                </div>
-            </body>
-            </html>
-            '''
-            components.html(featured_full_html, height=380)
-            
-            # Section Header for Other Matches
-            st.markdown('''
-            <div style="margin: 0.5rem 0 0.75rem 0;">
-                <h3 style="margin: 0; font-size: 1.25rem; font-weight: 600; color: #1F2937;">
-                    More Career Opportunities
-                </h3>
-                <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: #6B7280;">
-                    Explore other roles that match your profile
-                </p>
-            </div>
-            ''', unsafe_allow_html=True)
-            
-            st.markdown('<div class="spacer-sm"></div>', unsafe_allow_html=True)
-            
-            # Grid of Role Cards (positions 2-9) using components.html
-            roles_to_display = top_roles[1:9]  # Show next 8 roles
-            
-            # Create rows of 4 cards each
-            for row_idx in range(0, len(roles_to_display), 4):
-                cols = st.columns(4, gap="medium")
-                for col_idx, col in enumerate(cols):
-                    role_idx = row_idx + col_idx
-                    if role_idx < len(roles_to_display):
-                        role = roles_to_display[role_idx]
-                        score = role["score"] * 100
-                        rank = role_idx + 2
-                        is_target = target_role.lower() == role["role_name"].lower()
-                        strength_label, strength_color, strength_bg = get_match_strength(score)
-                        category_name, category_icon, category_color = get_role_category(role["role_name"])
-                        
-                        rank_display = "🥈" if rank == 2 else "🥉" if rank == 3 else f"#{rank}"
-                        target_badge = '<div style="display:inline-flex;align-items:center;gap:4px;background:#ECFDF5;color:#065F46;padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:700;border:1px solid #A7F3D0;margin-bottom:8px;">🎯 Target</div>' if is_target else ''
-                        dash_array = score * 1.508
-                        
-                        card_full_html = f'''
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                            <style>
-                                * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-                                body {{ font-family: 'Inter', -apple-system, sans-serif; background: transparent; }}
-                                .card {{
-                                    background: #FFFFFF;
-                                    border: 1px solid #E2E8F0;
-                                    border-radius: 16px;
-                                    padding: 1.2rem;
-                                    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-                                    height: 100%;
-                                    display: flex;
-                                    flex-direction: column;
-                                    gap: 0.75rem;
-                                }}
-                                .card:hover {{ box-shadow: 0 4px 12px rgba(0,0,0,0.06); }}
-                                .card-header {{
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: space-between;
-                                    gap: 8px;
-                                }}
-                                .rank {{ font-size: 0.9rem; font-weight: 700; color: #94A3B8; }}
-                                .category {{
-                                    display: inline-flex;
-                                    align-items: center;
-                                    gap: 4px;
-                                    padding: 4px 10px;
-                                    border-radius: 6px;
-                                    font-size: 0.75rem;
-                                    font-weight: 700;
-                                }}
-                                .title {{ font-size: 1rem; font-weight: 700; color: #1F2937; line-height: 1.4; }}
-                                .score-area {{
-                                    display: flex;
-                                    flex-direction: column;
-                                    align-items: center;
-                                    gap: 0.5rem;
-                                    margin-top: auto;
-                                    padding-top: 1rem;
-                                    border-top: 1px solid #F1F5F9;
-                                }}
-                                .strength {{ font-size: 0.85rem; font-weight: 700; text-align: center; }}
-                            </style>
-                        </head>
-                        <body>
-                            <div class="card">
-                                <div class="card-header">
-                                    <span class="rank">{rank_display}</span>
-                                    <span class="category" style="background:{category_color}15;color:{category_color};">
-                                        {category_icon} {category_name}
-                                    </span>
-                                </div>
-                                
-                                <div class="title">{role["role_name"]}</div>
-                                {target_badge}
-                                
-                                <div class="score-area">
-                                    <svg width="60" height="60" viewBox="0 0 60 60">
-                                        <circle cx="30" cy="30" r="24" fill="none" stroke="#E5E7EB" stroke-width="6"/>
-                                        <circle cx="30" cy="30" r="24" fill="none" stroke="{strength_color}" stroke-width="6"
-                                                stroke-dasharray="{dash_array} 150.8" 
-                                                stroke-linecap="round" 
-                                                transform="rotate(-90 30 30)"/>
-                                        <text x="30" y="34" text-anchor="middle" font-size="14" font-weight="700" fill="#1F2937">{score:.0f}%</text>
-                                    </svg>
-                                    <div class="strength" style="color:{strength_color};">{strength_label}</div>
-                                </div>
-                            </div>
-                        </body>
-                        </html>
-                        '''
-                        with col:
-                            components.html(card_full_html, height=260)
-            
-            # Show remaining count if more than 9 roles
-            if len(top_roles) > 9:
-                remaining = len(top_roles) - 9
-                plural = 's' if remaining > 1 else ''
-                st.markdown(f'''
-                <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:1.2rem;margin-top:1rem;background:#F8FAFC;border:1px dashed #E2E8F0;border-radius:16px;color:#475569;font-size:0.95rem;font-weight:600;">
-                    <span>+{remaining} more role{plural} in your profile</span>
-                </div>
-                ''', unsafe_allow_html=True)
+                return ("General", "💼", "#6B7280")
+
+            def _bd_color(val):
+                if val >= 0.7: return "#10B981"
+                if val >= 0.5: return "#6366F1"
+                if val >= 0.3: return "#F59E0B"
+                return "#EF4444"
+
+            # ═══════════════════════════════════════════════
+            # Hero — #1 Best Match
+            # ═══════════════════════════════════════════════
+            top = top_roles[0]
+            t_score = top["score"] * 100
+            t_bd = top.get("breakdown", {})
+            t_sem = t_bd.get("semantic", 0)
+            t_sk  = t_bd.get("skills", 0)
+            t_exp = t_bd.get("experience", 0)
+            t_kw  = t_bd.get("keywords", 0)
+            is_target_top = target_role.lower() == top["role_name"].lower()
+            s_label, s_color, s_bg = _match_strength(t_score)
+            c_name, c_icon, c_color = _role_cat(top["role_name"])
+
+            target_tag = '<div class="rm-hero-target">🎯 Your Target Role</div>' if is_target_top else ''
+
+            hero_html = f'''<div class="rm-hero">
+<div class="rm-hero-badge">⭐ Best Match</div>
+<div class="rm-hero-body">
+<div class="rm-hero-info">
+<div class="rm-hero-cat" style="color:{c_color};">{c_icon} {html.escape(c_name)}</div>
+<div class="rm-hero-role">{html.escape(top["role_name"])}</div>
+{target_tag}
+</div>
+<div class="rm-hero-score">
+<div class="rm-hero-pct">{t_score:.0f}%</div>
+<div class="rm-hero-pct-label">Match Score</div>
+</div>
+</div>
+<div class="rm-hero-breakdown">
+<div class="rm-bd-item"><div class="rm-bd-val" style="color:{_bd_color(t_sem)};">{t_sem*100:.0f}%</div><div class="rm-bd-label">Semantic</div><div class="rm-bd-bar"><div class="rm-bd-fill" style="width:{t_sem*100:.0f}%;background:{_bd_color(t_sem)};"></div></div></div>
+<div class="rm-bd-item"><div class="rm-bd-val" style="color:{_bd_color(t_sk)};">{t_sk*100:.0f}%</div><div class="rm-bd-label">Skills</div><div class="rm-bd-bar"><div class="rm-bd-fill" style="width:{t_sk*100:.0f}%;background:{_bd_color(t_sk)};"></div></div></div>
+<div class="rm-bd-item"><div class="rm-bd-val" style="color:{_bd_color(t_exp)};">{t_exp*100:.0f}%</div><div class="rm-bd-label">Experience</div><div class="rm-bd-bar"><div class="rm-bd-fill" style="width:{t_exp*100:.0f}%;background:{_bd_color(t_exp)};"></div></div></div>
+<div class="rm-bd-item"><div class="rm-bd-val" style="color:{_bd_color(t_kw)};">{t_kw*100:.0f}%</div><div class="rm-bd-label">Keywords</div><div class="rm-bd-bar"><div class="rm-bd-fill" style="width:{t_kw*100:.0f}%;background:{_bd_color(t_kw)};"></div></div></div>
+</div>
+<div class="rm-hero-footer">
+<div class="rm-strength-badge" style="background:{s_bg};color:{s_color};">● {s_label} Match</div>
+<div class="rm-rank-label">#1 of {len(top_roles)} matched roles</div>
+</div>
+</div>'''
+            st.markdown(hero_html, unsafe_allow_html=True)
+
+            # ═══════════════════════════════════════════════
+            # Grid — Remaining Role Cards
+            # ═══════════════════════════════════════════════
+            remaining = top_roles[1:13]
+            if remaining:
+                st.markdown('''<div class="rm-sub-header"><div class="rm-sub-title">More Career Opportunities</div><div class="rm-sub-desc">Explore other roles aligned with your profile</div></div>''', unsafe_allow_html=True)
+
+                cards_html = '<div class="rm-grid">'
+                for idx, role in enumerate(remaining):
+                    rank = idx + 2
+                    sc = role["score"] * 100
+                    bd = role.get("breakdown", {})
+                    r_sem = bd.get("semantic", 0)
+                    r_sk  = bd.get("skills", 0)
+                    r_exp = bd.get("experience", 0)
+                    r_kw  = bd.get("keywords", 0)
+                    sl, scol, sbg = _match_strength(sc)
+                    cn, ci, cc = _role_cat(role["role_name"])
+                    is_target = target_role.lower() == role["role_name"].lower()
+
+                    rank_icon = "🥈" if rank == 2 else "🥉" if rank == 3 else f"#{rank}"
+                    tgt_html = '<div class="rm-card-target-tag">🎯 Target</div>' if is_target else ''
+
+                    cards_html += f'''<div class="rm-card">
+<div class="rm-card-top">
+<span class="rm-card-rank">{rank_icon}</span>
+<span class="rm-card-cat" style="background:{cc}12;color:{cc};">{ci} {html.escape(cn)}</span>
+</div>
+<div class="rm-card-role">{html.escape(role["role_name"])}</div>
+{tgt_html}
+<div class="rm-card-score-row">
+<div class="rm-card-pct" style="color:{scol};">{sc:.0f}%</div>
+<div class="rm-card-bar-wrap">
+<div class="rm-card-bar-track"><div class="rm-card-bar-fill" style="width:{sc:.0f}%;background:linear-gradient(90deg,{scol},{scol}88);"></div></div>
+<div class="rm-card-strength" style="color:{scol};">{sl}</div>
+</div>
+</div>
+<div class="rm-card-bd">
+<div class="rm-card-bd-item"><div class="rm-card-bd-val" style="color:{_bd_color(r_sem)};">{r_sem*100:.0f}%</div><div class="rm-card-bd-label">Sem</div><div class="rm-card-bd-bar"><div class="rm-card-bd-fill" style="width:{r_sem*100:.0f}%;background:{_bd_color(r_sem)};"></div></div></div>
+<div class="rm-card-bd-item"><div class="rm-card-bd-val" style="color:{_bd_color(r_sk)};">{r_sk*100:.0f}%</div><div class="rm-card-bd-label">Skill</div><div class="rm-card-bd-bar"><div class="rm-card-bd-fill" style="width:{r_sk*100:.0f}%;background:{_bd_color(r_sk)};"></div></div></div>
+<div class="rm-card-bd-item"><div class="rm-card-bd-val" style="color:{_bd_color(r_exp)};">{r_exp*100:.0f}%</div><div class="rm-card-bd-label">Exp</div><div class="rm-card-bd-bar"><div class="rm-card-bd-fill" style="width:{r_exp*100:.0f}%;background:{_bd_color(r_exp)};"></div></div></div>
+<div class="rm-card-bd-item"><div class="rm-card-bd-val" style="color:{_bd_color(r_kw)};">{r_kw*100:.0f}%</div><div class="rm-card-bd-label">Kwd</div><div class="rm-card-bd-bar"><div class="rm-card-bd-fill" style="width:{r_kw*100:.0f}%;background:{_bd_color(r_kw)};"></div></div></div>
+</div>
+</div>'''
+
+                cards_html += '</div>'
+                st.markdown(cards_html, unsafe_allow_html=True)
+
+            # Show overflow indicator
+            if len(top_roles) > 13:
+                extra = len(top_roles) - 13
+                st.markdown(f'<div class="rm-more">+{extra} more role{"s" if extra > 1 else ""} matched to your profile</div>', unsafe_allow_html=True)
         else:
             st.info("No role matching data available.")
 
@@ -2797,111 +2765,607 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
             st.info("No JD comparison data — paste a job description in the sidebar.")
 
     # ─────────────────────────────────────────────────────────
-    # TAB 4 — Skills & Gaps
+    # TAB 4 — Skills & Gaps (Complete Redesign)
     # ─────────────────────────────────────────────────────────
     with tabs[3]:
-        s1, s2 = st.columns(2, gap="medium")
-
-        with s1:
-            matched = skill_gap.get("matched_skills", [])
-            st.markdown(f'''
-            <div class="glass-panel">
-                <div class="glass-panel-header">
-                    <div class="gp-icon" style="background:#ECFDF5;">✅</div>
-                    <div class="gp-title">Matched Skills</div>
-                    <div class="gp-count">{len(matched)}</div>
-                </div>
-            </div>''', unsafe_allow_html=True)
-            st.markdown(f'<div style="margin-bottom:0.5rem;"><span class="badge badge-excellent">Coverage: {coverage_pct:.1f}%</span></div>', unsafe_allow_html=True)
-            if matched:
-                st.markdown(chips_html(matched, "chip-matched"), unsafe_allow_html=True)
-
-        with s2:
-            missing = skill_gap.get("missing_skills", [])
-            st.markdown(f'''
-            <div class="glass-panel">
-                <div class="glass-panel-header">
-                    <div class="gp-icon" style="background:#FFF7ED;">❌</div>
-                    <div class="gp-title">Missing Skills</div>
-                    <div class="gp-count">{len(missing)}</div>
-                </div>
-            </div>''', unsafe_allow_html=True)
-            if missing:
-                st.markdown(chips_html(missing, "chip-missing"), unsafe_allow_html=True)
-            else:
-                st.success("You have all the required skills!")
-
-        st.markdown('<div class="spacer-sm"></div>', unsafe_allow_html=True)
-
-        ss1, ss2 = st.columns(2, gap="medium")
-
-        with ss1:
-            st.markdown('''
-            <div class="glass-panel">
-                <div class="glass-panel-header">
-                    <div class="gp-icon" style="background:#F0F9FF;">💬</div>
-                    <div class="gp-title">Soft Skills</div>
-                </div>
-            </div>''', unsafe_allow_html=True)
-            detected_soft = soft_skill.get("detected", soft_skill.get("soft_skills", []))
-            if isinstance(detected_soft, list) and detected_soft:
-                st.markdown(chips_html(detected_soft, "chip-soft"), unsafe_allow_html=True)
-            elif isinstance(detected_soft, dict):
-                for cat, items in detected_soft.items():
-                    st.markdown(f"**{cat}:**")
-                    if isinstance(items, list):
-                        st.markdown(chips_html(items, "chip-soft"), unsafe_allow_html=True)
-            else:
-                st.info("No soft skills detected.")
-
-        with ss2:
-            ia_score = industry.get("alignment_score", 0)
-            st.markdown(f'''
-            <div class="glass-panel">
-                <div class="glass-panel-header">
-                    <div class="gp-icon" style="background:#FFFBEB;">📈</div>
-                    <div class="gp-title">Industry Alignment</div>
-                    <div class="gp-count">{ia_score:.0f}%</div>
-                </div>
-            </div>''', unsafe_allow_html=True)
-            st.markdown(f'<div style="margin-bottom:0.5rem;"><span class="badge {_badge_cls(ia_score)}">Alignment: {ia_score:.1f}%</span></div>', unsafe_allow_html=True)
-            aligned = industry.get("aligned_skills", [])
-            if aligned:
-                st.markdown(f"**High-Demand Skills ({len(aligned)}):**")
-                st.markdown(chips_html(aligned, "chip-matched"), unsafe_allow_html=True)
-            trending = industry.get("trending_skills", [])
-            if trending:
-                st.markdown('<div style="margin-top:10px;padding-top:10px;border-top:1px solid #F1F5F9;font-size:0.82rem;font-weight:600;color:#475569;">🔥 Trending Skills</div>', unsafe_allow_html=True)
-                st.markdown(chips_html(trending[:15], "chip-trending"), unsafe_allow_html=True)
-
-        st.markdown('<div class="spacer-sm"></div>', unsafe_allow_html=True)
-
-        # Certifications
-        st.markdown('''
-        <div class="glass-panel">
-            <div class="glass-panel-header">
-                <div class="gp-icon" style="background:#FDF4FF;">🏆</div>
-                <div class="gp-title">Certification Suggestions</div>
-            </div>
-        </div>''', unsafe_allow_html=True)
+        # Extract all skill data
+        matched_skills = skill_gap.get("matched_skills", [])
+        missing_skills = skill_gap.get("missing_skills", [])
+        total_skills = len(matched_skills) + len(missing_skills)
+        skill_coverage = (len(matched_skills) / total_skills * 100) if total_skills > 0 else 0
+        
+        detected_soft = soft_skill.get("detected", soft_skill.get("soft_skills", []))
+        if isinstance(detected_soft, dict):
+            detected_soft = [item for items in detected_soft.values() for item in (items if isinstance(items, list) else [items])]
+        
+        ia_score = industry.get("alignment_score", 0)
+        aligned_skills = industry.get("aligned_skills", [])
+        trending_skills = industry.get("trending_skills", [])
+        
         cert_list = certifications.get("suggestions", certifications.get("certifications", []))
-        if isinstance(cert_list, list) and cert_list:
-            for cert in cert_list[:10]:
-                if isinstance(cert, dict):
-                    name     = cert.get("name", cert.get("certification", ""))
-                    provider = cert.get("provider", "")
-                    skill    = cert.get("for_skill", cert.get("skill", ""))
-                    st.markdown(
-                        f'<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #F8FAFC;">'
-                        f'<span>🏆</span> <b>{name}</b>'
-                        f' <span style="color:#94A3B8;">({provider})</span>'
-                        f' <span class="badge badge-good">For: {skill}</span>'
-                        f'</div>', unsafe_allow_html=True,
-                    )
-                else:
-                    st.markdown(f"• {cert}")
+        
+        # ═══════════════════════════════════════════════════════════
+        # SKILL OVERVIEW DASHBOARD - Hero Stats
+        # ═══════════════════════════════════════════════════════════
+        
+        # Determine skill health status
+        if skill_coverage >= 80:
+            health_status = "Excellent"
+            health_color = "#10B981"
+            health_emoji = "🌟"
+        elif skill_coverage >= 60:
+            health_status = "Good"
+            health_color = "#6366F1"
+            health_emoji = "👍"
+        elif skill_coverage >= 40:
+            health_status = "Needs Work"
+            health_color = "#F59E0B"
+            health_emoji = "⚠️"
         else:
-            st.info("No certification suggestions at this time.")
+            health_status = "Critical Gap"
+            health_color = "#EF4444"
+            health_emoji = "🚨"
+        
+        dashboard_html = f'''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                body {{ font-family: 'Inter', -apple-system, sans-serif; background: transparent; }}
+                .skill-dashboard {{
+                    display: grid;
+                    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+                    gap: 1rem;
+                }}
+                .stat-card {{
+                    background: #FFFFFF;
+                    border: 1px solid #E2E8F0;
+                    border-radius: 16px;
+                    padding: 1.25rem;
+                    text-align: center;
+                    position: relative;
+                    overflow: hidden;
+                }}
+                .stat-card.featured {{
+                    background: linear-gradient(135deg, #FAFAFA 0%, #F5F3FF 100%);
+                    border: 2px solid #E0E7FF;
+                    display: flex;
+                    align-items: center;
+                    gap: 1.25rem;
+                    text-align: left;
+                }}
+                .featured-ring {{
+                    flex-shrink: 0;
+                }}
+                .featured-content {{ flex: 1; }}
+                .featured-title {{ font-size: 0.75rem; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }}
+                .featured-status {{ font-size: 1.75rem; font-weight: 900; color: {health_color}; line-height: 1; margin-bottom: 4px; }}
+                .featured-label {{ font-size: 0.85rem; color: #475569; font-weight: 600; }}
+                
+                .stat-icon {{ font-size: 1.5rem; margin-bottom: 0.5rem; }}
+                .stat-value {{ font-size: 2rem; font-weight: 800; color: #1F2937; line-height: 1; }}
+                .stat-label {{ font-size: 0.8rem; color: #6B7280; font-weight: 600; margin-top: 0.25rem; }}
+                .stat-badge {{
+                    display: inline-block;
+                    padding: 4px 10px;
+                    border-radius: 99px;
+                    font-size: 0.7rem;
+                    font-weight: 700;
+                    margin-top: 0.5rem;
+                }}
+                .badge-green {{ background: #ECFDF5; color: #047857; }}
+                .badge-amber {{ background: #FFFBEB; color: #92400E; }}
+                .badge-red {{ background: #FEF2F2; color: #DC2626; }}
+            </style>
+        </head>
+        <body>
+            <div class="skill-dashboard">
+                <div class="stat-card featured">
+                    <div class="featured-ring">
+                        <svg width="90" height="90" viewBox="0 0 90 90">
+                            <circle cx="45" cy="45" r="38" fill="none" stroke="#E5E7EB" stroke-width="7"/>
+                            <circle cx="45" cy="45" r="38" fill="none" stroke="{health_color}" stroke-width="7"
+                                    stroke-dasharray="{skill_coverage * 2.39} 239" 
+                                    stroke-linecap="round" 
+                                    transform="rotate(-90 45 45)"/>
+                            <text x="45" y="50" text-anchor="middle" font-size="18" font-weight="800" fill="#1F2937">{skill_coverage:.0f}%</text>
+                        </svg>
+                    </div>
+                    <div class="featured-content">
+                        <div class="featured-title">Skill Health</div>
+                        <div class="featured-status">{health_emoji} {health_status}</div>
+                        <div class="featured-label">{len(matched_skills)}/{total_skills} skills matched</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" style="color:#10B981;">{len(matched_skills)}</div>
+                    <div class="stat-label">Skills You Have</div>
+                    <div class="stat-badge badge-green">Ready</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-value" style="color:#EF4444;">{len(missing_skills)}</div>
+                    <div class="stat-label">Skills to Learn</div>
+                    <div class="stat-badge badge-{'red' if len(missing_skills) > 5 else 'amber'}">{('High' if len(missing_skills) > 5 else 'Medium') + ' Priority'}</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">💼</div>
+                    <div class="stat-value" style="color:#6366F1;">{ia_score:.0f}%</div>
+                    <div class="stat-label">Industry Fit</div>
+                    <div class="stat-badge badge-{'green' if ia_score >= 60 else 'amber'}">{'Strong' if ia_score >= 60 else 'Growing'}</div>
+                </div>
+            </div>
+        </body>
+        </html>
+        '''
+        components.html(dashboard_html, height=165)
+        
+        # ═══════════════════════════════════════════════════════════
+        # SKILL COMPARISON - Two Column Layout
+        # ═══════════════════════════════════════════════════════════
+        
+        # Build skill chips HTML
+        matched_chips = ''.join([f'<div class="skill-chip matched"><span class="chip-icon">✓</span>{skill}</div>' for skill in matched_skills[:15]])
+        more_matched = f'<div class="more-indicator">+{len(matched_skills) - 15} more skills</div>' if len(matched_skills) > 15 else ''
+        
+        missing_chips = ''.join([f'<div class="skill-chip missing"><span class="chip-icon">+</span>{skill}</div>' for skill in missing_skills[:10]])
+        more_missing = f'<div class="more-indicator">+{len(missing_skills) - 10} more to learn</div>' if len(missing_skills) > 10 else ''
+        
+        comparison_html = f'''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                body {{ font-family: 'Inter', -apple-system, sans-serif; background: transparent; }}
+                .compare-container {{
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 1rem;
+                }}
+                .compare-panel {{
+                    background: #FFFFFF;
+                    border: 1px solid #E2E8F0;
+                    border-radius: 16px;
+                    padding: 1.25rem;
+                    position: relative;
+                }}
+                .compare-panel.has {{ border-left: 4px solid #10B981; }}
+                .compare-panel.needs {{ border-left: 4px solid #EF4444; }}
+                
+                .panel-header {{
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 1rem;
+                    padding-bottom: 0.75rem;
+                    border-bottom: 1px solid #F1F5F9;
+                }}
+                .panel-title {{
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }}
+                .panel-icon {{
+                    width: 36px; height: 36px;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.1rem;
+                }}
+                .panel-icon.green {{ background: #ECFDF5; }}
+                .panel-icon.red {{ background: #FEF2F2; }}
+                .panel-label {{ font-size: 1rem; font-weight: 700; color: #1F2937; }}
+                .panel-count {{
+                    padding: 6px 14px;
+                    border-radius: 99px;
+                    font-size: 0.85rem;
+                    font-weight: 800;
+                }}
+                .count-green {{ background: #ECFDF5; color: #047857; }}
+                .count-red {{ background: #FEF2F2; color: #DC2626; }}
+                
+                .skill-grid {{
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 8px;
+                }}
+                .skill-chip {{
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 8px 14px;
+                    border-radius: 8px;
+                    font-size: 0.88rem;
+                    font-weight: 600;
+                    transition: transform 0.15s;
+                }}
+                .skill-chip:hover {{ transform: translateY(-2px); }}
+                .skill-chip.matched {{
+                    background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+                    color: #047857;
+                    border: 1px solid #A7F3D0;
+                }}
+                .skill-chip.missing {{
+                    background: linear-gradient(135deg, #FEF2F2 0%, #FECACA 100%);
+                    color: #DC2626;
+                    border: 1px solid #FECACA;
+                }}
+                .chip-icon {{
+                    font-size: 0.75rem;
+                    font-weight: 900;
+                }}
+                .more-indicator {{
+                    padding: 8px 14px;
+                    font-size: 0.85rem;
+                    color: #6B7280;
+                    font-style: italic;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="compare-container">
+                <div class="compare-panel has">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="panel-icon green">✓</div>
+                            <span class="panel-label">Skills You Have</span>
+                        </div>
+                        <div class="panel-count count-green">{len(matched_skills)}</div>
+                    </div>
+                    <div class="skill-grid">
+                        {matched_chips if matched_chips else '<span style="color:#6B7280;font-size:0.9rem;">No matched skills found</span>'}
+                        {more_matched}
+                    </div>
+                </div>
+                
+                <div class="compare-panel needs">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="panel-icon red">+</div>
+                            <span class="panel-label">Skills to Develop</span>
+                        </div>
+                        <div class="panel-count count-red">{len(missing_skills)}</div>
+                    </div>
+                    <div class="skill-grid">
+                        {missing_chips if missing_chips else '<span style="color:#10B981;font-size:0.9rem;font-weight:600;">🎉 Great! You have all required skills!</span>'}
+                        {more_missing}
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+        '''
+        # Dynamic height based on content - tighter calculation
+        matched_rows = (min(len(matched_skills), 15) + 3) // 4
+        missing_rows = (min(len(missing_skills), 10) + 3) // 4
+        max_rows = max(matched_rows, missing_rows, 1)
+        comparison_height = 100 + (max_rows * 45)
+        components.html(comparison_html, height=comparison_height)
+        
+        # ═══════════════════════════════════════════════════════════
+        # SOFT SKILLS & INDUSTRY INSIGHTS - Combined Section
+        # ═══════════════════════════════════════════════════════════
+        
+        # Build soft skills chips
+        soft_chips = ''.join([f'<span class="soft-chip">{skill}</span>' for skill in (detected_soft[:10] if isinstance(detected_soft, list) else [])])
+        
+        # Build aligned skills chips
+        aligned_chips = ''.join([f'<span class="aligned-chip">{skill}</span>' for skill in aligned_skills[:8]])
+        
+        # Build trending skills chips
+        trending_chips = ''.join([f'<span class="trend-chip">🔥 {skill}</span>' for skill in trending_skills[:8]])
+        
+        insights_html = f'''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                body {{ font-family: 'Inter', -apple-system, sans-serif; background: transparent; }}
+                .insights-grid {{
+                    display: grid;
+                    grid-template-columns: 1fr 1.5fr;
+                    gap: 1rem;
+                }}
+                .insight-card {{
+                    background: #FFFFFF;
+                    border: 1px solid #E2E8F0;
+                    border-radius: 16px;
+                    padding: 1.25rem;
+                }}
+                .insight-header {{
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 1rem;
+                }}
+                .insight-icon {{
+                    width: 36px; height: 36px;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.1rem;
+                }}
+                .insight-title {{ font-size: 1rem; font-weight: 700; color: #1F2937; }}
+                
+                .soft-grid {{ display: flex; flex-wrap: wrap; gap: 8px; }}
+                .soft-chip {{
+                    padding: 8px 14px;
+                    background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+                    color: #4338CA;
+                    border: 1px solid #C7D2FE;
+                    border-radius: 8px;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                }}
+                
+                .industry-section {{
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1rem;
+                }}
+                .industry-meter {{
+                    background: #F8FAFC;
+                    border-radius: 12px;
+                    padding: 1rem;
+                }}
+                .meter-label {{ font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 0.5rem; display: flex; justify-content: space-between; }}
+                .meter-track {{
+                    height: 10px;
+                    background: #E2E8F0;
+                    border-radius: 99px;
+                    overflow: hidden;
+                }}
+                .meter-fill {{
+                    height: 100%;
+                    border-radius: 99px;
+                    background: linear-gradient(90deg, #6366F1, #8B5CF6);
+                    width: {ia_score}%;
+                }}
+                
+                .skill-section {{ margin-top: 0.75rem; }}
+                .skill-section-title {{
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    color: #6B7280;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 0.5rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }}
+                .skill-chips {{ display: flex; flex-wrap: wrap; gap: 6px; }}
+                .aligned-chip {{
+                    padding: 6px 12px;
+                    background: #ECFDF5;
+                    color: #047857;
+                    border: 1px solid #A7F3D0;
+                    border-radius: 6px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                }}
+                .trend-chip {{
+                    padding: 6px 12px;
+                    background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+                    color: #C2410C;
+                    border: 1px solid #FDBA74;
+                    border-radius: 6px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <div class="insight-icon" style="background:#EEF2FF;">💬</div>
+                        <span class="insight-title">Soft Skills Detected</span>
+                    </div>
+                    <div class="soft-grid">
+                        {soft_chips if soft_chips else '<span style="color:#6B7280;font-size:0.9rem;">No soft skills detected</span>'}
+                    </div>
+                </div>
+                
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <div class="insight-icon" style="background:#F0FDF4;">📊</div>
+                        <span class="insight-title">Industry Alignment</span>
+                    </div>
+                    <div class="industry-section">
+                        <div class="industry-meter">
+                            <div class="meter-label">
+                                <span>Market Relevance</span>
+                                <span style="font-weight:800;color:#6366F1;">{ia_score:.0f}%</span>
+                            </div>
+                            <div class="meter-track">
+                                <div class="meter-fill"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="skill-section">
+                            <div class="skill-section-title">
+                                <span style="color:#10B981;">●</span> High-Demand Skills You Have
+                            </div>
+                            <div class="skill-chips">
+                                {aligned_chips if aligned_chips else '<span style="color:#6B7280;font-size:0.85rem;">—</span>'}
+                            </div>
+                        </div>
+                        
+                        <div class="skill-section">
+                            <div class="skill-section-title">
+                                <span style="color:#F97316;">●</span> Trending in Industry
+                            </div>
+                            <div class="skill-chips">
+                                {trending_chips if trending_chips else '<span style="color:#6B7280;font-size:0.85rem;">—</span>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+        '''
+        # Calculate insight height based on content - tighter
+        soft_rows = (len(detected_soft) + 3) // 4 if isinstance(detected_soft, list) else 1
+        aligned_rows = (len(aligned_skills) + 5) // 6 if aligned_skills else 0
+        trending_rows = (len(trending_skills) + 5) // 6 if trending_skills else 0
+        insights_height = 185 + (soft_rows * 32) + (aligned_rows * 32) + (trending_rows * 40)
+        insights_height = max(insights_height, 260) if (aligned_skills or trending_skills) else max(insights_height, 160)
+        components.html(insights_html, height=insights_height)
+        
+        # ═══════════════════════════════════════════════════════════
+        # CERTIFICATION ROADMAP - Modern Card Layout
+        # ═══════════════════════════════════════════════════════════
+        
+        if isinstance(cert_list, list) and cert_list:
+            cert_cards = ''
+            for i, cert in enumerate(cert_list[:6]):
+                if isinstance(cert, dict):
+                    name = cert.get("name", cert.get("certification", ""))
+                    provider = cert.get("provider", "")
+                    skill = cert.get("for_skill", cert.get("skill", ""))
+                    
+                    # Assign priority based on position
+                    if i < 2:
+                        priority = "high"
+                        priority_color = "#EF4444"
+                        priority_bg = "#FEF2F2"
+                    elif i < 4:
+                        priority = "medium"
+                        priority_color = "#F59E0B"
+                        priority_bg = "#FFFBEB"
+                    else:
+                        priority = "optional"
+                        priority_color = "#6B7280"
+                        priority_bg = "#F3F4F6"
+                    
+                    cert_cards += f'''
+                    <div class="cert-card">
+                        <div class="cert-priority" style="background:{priority_bg};color:{priority_color};">{priority.upper()}</div>
+                        <div class="cert-content">
+                            <div class="cert-name">{name}</div>
+                            <div class="cert-provider">{provider}</div>
+                        </div>
+                        <div class="cert-skill">
+                            <span class="skill-tag">For: {skill}</span>
+                        </div>
+                    </div>
+                    '''
+            
+            cert_html = f'''
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                    body {{ font-family: 'Inter', -apple-system, sans-serif; background: transparent; }}
+                    .cert-section {{
+                        background: #FFFFFF;
+                        border: 1px solid #E2E8F0;
+                        border-radius: 16px;
+                        padding: 1.25rem;
+                    }}
+                    .cert-header {{
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        margin-bottom: 1rem;
+                        padding-bottom: 0.75rem;
+                        border-bottom: 1px solid #F1F5F9;
+                    }}
+                    .cert-icon {{
+                        width: 36px; height: 36px;
+                        background: #FDF4FF;
+                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.1rem;
+                    }}
+                    .cert-title {{ font-size: 1rem; font-weight: 700; color: #1F2937; }}
+                    
+                    .cert-grid {{
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 12px;
+                    }}
+                    .cert-card {{
+                        background: #FAFAFA;
+                        border: 1px solid #E2E8F0;
+                        border-radius: 12px;
+                        padding: 1rem;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+                        transition: transform 0.15s, box-shadow 0.15s;
+                    }}
+                    .cert-card:hover {{
+                        transform: translateY(-3px);
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                    }}
+                    .cert-priority {{
+                        display: inline-block;
+                        padding: 4px 10px;
+                        border-radius: 6px;
+                        font-size: 0.65rem;
+                        font-weight: 800;
+                        letter-spacing: 0.5px;
+                        width: fit-content;
+                    }}
+                    .cert-content {{ flex: 1; }}
+                    .cert-name {{
+                        font-size: 0.92rem;
+                        font-weight: 700;
+                        color: #1F2937;
+                        line-height: 1.3;
+                        margin-bottom: 4px;
+                    }}
+                    .cert-provider {{
+                        font-size: 0.8rem;
+                        color: #6B7280;
+                    }}
+                    .cert-skill {{
+                        padding-top: 8px;
+                        border-top: 1px solid #E5E7EB;
+                    }}
+                    .skill-tag {{
+                        display: inline-block;
+                        padding: 4px 10px;
+                        background: #ECFDF5;
+                        color: #047857;
+                        border-radius: 6px;
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="cert-section">
+                    <div class="cert-header">
+                        <div class="cert-icon">🏆</div>
+                        <span class="cert-title">Recommended Certifications</span>
+                    </div>
+                    <div class="cert-grid">
+                        {cert_cards}
+                    </div>
+                </div>
+            </body>
+            </html>
+            '''
+            cert_count = min(len(cert_list), 6)
+            cert_rows = (cert_count + 2) // 3
+            cert_height = 100 + (cert_rows * 180)
+            components.html(cert_html, height=cert_height)
 
     # ─────────────────────────────────────────────────────────
     # TAB 5 — Career Path
@@ -2917,27 +3381,31 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
 
         paths = career.get("paths", career.get("career_paths", []))
         if isinstance(paths, list) and paths:
-            for path in paths:
+            # Build the timeline HTML
+            timeline_html = ''
+            for idx, path in enumerate(paths):
                 if isinstance(path, dict):
-                    from_role  = path.get("from_role", path.get("current", ""))
-                    to_role    = path.get("to_role", path.get("next", ""))
-                    transition = path.get("transition_type", path.get("type", ""))
+                    from_role  = html.escape(str(path.get("from_role", path.get("current", ""))))
+                    to_role    = html.escape(str(path.get("to_role", path.get("next", ""))))
+                    transition = html.escape(str(path.get("transition_type", path.get("type", ""))))
+                    overlap = path.get("skill_overlap", 0)
+                    
+                    # Determine badge color
                     if "promotion" in transition.lower():
-                        tl_cls, bdg, ico = "tl-promo", "badge-promotion", "⬆️"
+                        badge_class = "cp-badge-green"
                     elif "lateral" in transition.lower():
-                        tl_cls, bdg, ico = "tl-lat", "badge-lateral", "↔️"
+                        badge_class = "cp-badge-blue"
                     else:
-                        tl_cls, bdg, ico = "tl-pivot", "badge-pivot", "🔄"
-                    st.markdown(f'''
-                    <div class="tl-item {tl_cls}">
-                        <div class="tl-body">
-                            <div class="tl-from">{ico} From: {from_role}</div>
-                            <div class="tl-to">{to_role}</div>
-                            <span class="badge {bdg}">{transition}</span>
-                        </div>
-                    </div>''', unsafe_allow_html=True)
-                else:
-                    st.markdown(f"• {path}")
+                        badge_class = "cp-badge-orange"
+                    
+                    is_last = idx == len(paths) - 1
+                    item_class = "cp-item cp-last" if is_last else "cp-item"
+                    line_html = "" if is_last else '<div class="cp-line"></div>'
+                    overlap_html = f'<span class="cp-overlap">{overlap:.0f}% match</span>' if overlap else ""
+                    
+                    timeline_html += f'<div class="{item_class}"><div class="cp-timeline"><div class="cp-node"></div>{line_html}</div><div class="cp-content"><div class="cp-from">From: {from_role}</div><div class="cp-to">{to_role}</div><div class="cp-meta"><span class="cp-badge {badge_class}">{transition}</span>{overlap_html}</div></div></div>'
+            
+            st.markdown(f'<div class="cp-container">{timeline_html}</div>', unsafe_allow_html=True)
         else:
             st.info("No career path data available for this role.")
 
@@ -2953,13 +3421,13 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
         </div>''', unsafe_allow_html=True)
         verdict = explanation.get("verdict", "")
         if verdict:
-            st.markdown(f'<div style="margin-top: 1.2rem; font-weight: 700; font-size: 1.05rem;">{verdict}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="margin-top: 1.2rem; font-weight: 700; font-size: 1.05rem;">{html.escape(str(verdict))}</div>', unsafe_allow_html=True)
         detail = explanation.get("detail", explanation.get("reasoning", []))
         if isinstance(detail, list):
             for d in detail:
-                st.markdown(f'<div class="insight-row ir-blue">{d}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="insight-row ir-blue">{html.escape(str(d))}</div>', unsafe_allow_html=True)
         elif isinstance(detail, str):
-            st.markdown(detail)
+            st.markdown(html.escape(detail))
 
     # ─────────────────────────────────────────────────────────
     # TAB 6 — Improvements
@@ -3027,405 +3495,361 @@ if st.session_state.get("analyzed") and "report" in st.session_state:
                 st.markdown(summary)
 
     # ─────────────────────────────────────────────────────────
-    # TAB 7 — Full Report
+    # TAB 7 — Full Report (Redesigned)
     # ─────────────────────────────────────────────────────────
     with tabs[6]:
-        st.markdown('''
-        <div class="glass-panel">
-            <div class="glass-panel-header">
-                <div class="gp-icon" style="background:#EEF2FF;">📄</div>
-                <div class="gp-title">Complete Analysis Report</div>
+        # ---- Prepare data ----
+        r_ats_score = ats.get("final_score", 0)
+        r_skill_coverage = skill_gap.get("coverage_percent", 0)
+        r_jd_match = jd_comp.get("overall_match_percent", 0) if jd_comp else 0
+        r_ats_sim = ats_sim.get("ats_compatibility_score", 0)
+        r_soft = soft_skill.get("composite_score", 0) if isinstance(soft_skill.get("composite_score"), (int, float)) else 0
+        r_industry = industry.get("alignment_score", 0) if isinstance(industry.get("alignment_score"), (int, float)) else 0
+        r_quality = improvements.get("improvement_score", 0)
+
+        r_matched = skill_gap.get("matched_skills", [])
+        r_missing = skill_gap.get("missing_skills", [])
+        r_suggestions = improvements.get("suggestions", [])[:8]
+        r_top_roles = role_matches.get("top_roles", [])[:5]
+        r_career = career.get("paths", [])[:4]
+        r_certs = certifications.get("suggestions", certifications.get("recommended", []))[:6]
+
+        r_edu = profile.get("education", {})
+        r_exp = profile.get("experience", {})
+        r_degrees = r_edu.get("degrees", []) if isinstance(r_edu, dict) else []
+        r_institutions = r_edu.get("institutions", []) if isinstance(r_edu, dict) else []
+        r_max_yrs = r_exp.get("max_years", 0) if isinstance(r_exp, dict) else 0
+        r_titles = r_exp.get("job_titles", []) if isinstance(r_exp, dict) else []
+
+        # ---- Score summary bar ----
+        scores_data = [
+            ("ATS Score", r_ats_score, _clr(r_ats_score)),
+            ("Skills", r_skill_coverage, _clr(r_skill_coverage)),
+            ("JD Match", r_jd_match, _clr(r_jd_match)),
+            ("ATS Sim", r_ats_sim, _clr(r_ats_sim)),
+            ("Soft Skills", r_soft, _clr(r_soft)),
+            ("Industry", r_industry, _clr(r_industry)),
+            ("Quality", r_quality, _clr(r_quality)),
+        ]
+        score_cells = ""
+        for label, val, color in scores_data:
+            score_cells += f'''<div class="rpt-score-cell">
+                <div class="rpt-score-val" style="color:{color}">{val:.0f}%</div>
+                <div class="rpt-score-lbl">{label}</div>
+            </div>'''
+
+        # ---- Matched skills chips ----
+        matched_chips = ""
+        for s in r_matched[:20]:
+            matched_chips += f'<span class="rpt-chip rpt-chip-green">{s}</span>'
+        if not r_matched:
+            matched_chips = '<span class="rpt-empty">None detected</span>'
+
+        # ---- Missing skills chips ----
+        missing_chips = ""
+        for s in r_missing[:15]:
+            name = s if isinstance(s, str) else s.get("skill", "")
+            missing_chips += f'<span class="rpt-chip rpt-chip-red">{name}</span>'
+        if not r_missing:
+            missing_chips = '<span class="rpt-empty">No gaps found</span>'
+
+        # ---- Top roles rows ----
+        roles_rows = ""
+        for i, role in enumerate(r_top_roles):
+            rname = role.get("role_name", "Unknown")
+            rscore = role.get("score", 0) * 100
+            rcolor = _clr(rscore)
+            roles_rows += f'''<div class="rpt-table-row">
+                <span class="rpt-rank">#{i+1}</span>
+                <span class="rpt-role-name">{rname}</span>
+                <span class="rpt-role-score" style="color:{rcolor}">{rscore:.0f}%</span>
+            </div>'''
+        if not r_top_roles:
+            roles_rows = '<div class="rpt-empty">No role matches</div>'
+
+        # ---- Suggestions ----
+        suggestion_rows = ""
+        for imp in r_suggestions:
+            if isinstance(imp, dict):
+                msg = imp.get("suggestion", imp.get("message", ""))
+                pri = imp.get("priority", "medium")
+            else:
+                msg = str(imp)
+                pri = "medium"
+            pri_clr = "#EF4444" if pri == "high" else "#F59E0B" if pri == "medium" else "#6366F1"
+            suggestion_rows += f'''<div class="rpt-suggestion">
+                <div class="rpt-sug-dot" style="background:{pri_clr}"></div>
+                <div class="rpt-sug-text">{msg}</div>
+            </div>'''
+        if not r_suggestions:
+            suggestion_rows = '<div class="rpt-empty">No suggestions</div>'
+
+        # ---- Education & Experience ----
+        edu_items = ""
+        for d in r_degrees:
+            edu_items += f'<div class="rpt-list-item">{d}</div>'
+        for inst in r_institutions[:3]:
+            edu_items += f'<div class="rpt-list-item rpt-list-secondary">{inst}</div>'
+        if not r_degrees:
+            edu_items = '<div class="rpt-empty">Not detected</div>'
+
+        title_items = ""
+        for t in r_titles[:6]:
+            title_items += f'<div class="rpt-list-item">{t}</div>'
+        if not r_titles:
+            title_items = '<div class="rpt-empty">Not detected</div>'
+
+        # ---- Career paths ----
+        career_items = ""
+        badge_colors = {
+            "Promotion": "badge-green",
+            "Lateral Move": "badge-blue",
+            "Career Pivot": "badge-orange",
+            "Lateral": "badge-blue",
+            "Pivot": "badge-orange"
+        }
+        for idx, p in enumerate(r_career):
+            tgt = p.get("to_role", p.get("target_role", ""))
+            trans = p.get("transition_type", p.get("timeline", ""))
+            from_role = p.get("from_role", "Current Role")
+            overlap = p.get("skill_overlap", 0)
+            badge_class = badge_colors.get(trans, "badge-blue")
+            is_last = idx == len(r_career) - 1
+            career_items += f'''<div class="career-path-item {"last-item" if is_last else ""}">
+                <div class="career-timeline">
+                    <div class="timeline-node"></div>
+                    {"" if is_last else '<div class="timeline-line"></div>'}
+                </div>
+                <div class="career-content">
+                    <div class="career-from">From: {from_role}</div>
+                    <div class="career-to">{tgt}</div>
+                    <div class="career-meta">
+                        <span class="career-badge {badge_class}">{trans}</span>
+                        {f'<span class="career-overlap">{overlap:.0f}% match</span>' if overlap else ""}
+                    </div>
+                </div>
+            </div>'''
+        if not r_career:
+            career_items = '<div class="rpt-empty">No paths available</div>'
+
+        # ---- Certifications ----
+        cert_items = ""
+        for c in r_certs:
+            if isinstance(c, dict):
+                cname = c.get("certification", c.get("name", ""))
+            else:
+                cname = str(c)
+            if cname:
+                cert_items += f'<span class="rpt-chip rpt-chip-purple">{cname}</span>'
+        if not cert_items:
+            cert_items = '<span class="rpt-empty">None recommended</span>'
+
+        # ---- Compute height ----
+        chip_rows_matched = max(len(r_matched[:20]) // 4 + 1, 1)
+        chip_rows_missing = max(len(r_missing[:15]) // 4 + 1, 1)
+        skills_h = max(chip_rows_matched, chip_rows_missing) * 34 + 80
+        roles_h = max(len(r_top_roles), 1) * 44 + 60
+        suggestions_h = max(len(r_suggestions), 1) * 48 + 60
+        mid_h = max(roles_h, suggestions_h)
+        edu_h = max(len(r_degrees) + len(r_institutions[:3]), 1) * 32 + 55
+        exp_h = 75
+        career_h = max(len(r_career), 1) * 95 + 65
+        cert_chip_rows = max(len(r_certs) // 3 + 1, 1)
+        cert_h = cert_chip_rows * 36 + 55
+        left_h = edu_h + exp_h + 16
+        right_h = career_h + cert_h + 16
+        detail_h = max(left_h, right_h)
+        total_h = 90 + skills_h + 20 + mid_h + 30 + detail_h + 10
+
+        report_html = f'''<!DOCTYPE html>
+<html><head><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ font-family:'Inter',sans-serif; background:transparent; color:#1E293B; }}
+
+.rpt-score-bar {{
+    display:grid; grid-template-columns:repeat(7,1fr); gap:12px;
+    background:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px;
+    padding:20px 24px; margin-bottom:24px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.04);
+}}
+.rpt-score-cell {{ text-align:center; }}
+.rpt-score-val {{ font-size:1.35rem; font-weight:800; line-height:1.2; }}
+.rpt-score-lbl {{ font-size:0.72rem; font-weight:600; color:#94A3B8; text-transform:uppercase; letter-spacing:0.5px; margin-top:4px; }}
+
+.rpt-section {{
+    font-size:0.78rem; font-weight:700; color:#6366F1; text-transform:uppercase;
+    letter-spacing:1px; margin:20px 0 10px 0;
+    padding-bottom:6px; border-bottom:2px solid #EEF2FF;
+}}
+
+.rpt-grid-2 {{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }}
+
+.rpt-card {{
+    background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px;
+    padding:16px 20px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.03);
+}}
+.rpt-card-title {{
+    font-size:0.82rem; font-weight:700; color:#475569; margin-bottom:12px;
+    display:flex; align-items:center; gap:8px;
+}}
+.rpt-card-title span {{ font-size:1rem; }}
+
+.rpt-chip-wrap {{ display:flex; flex-wrap:wrap; gap:6px; }}
+.rpt-chip {{
+    display:inline-block; padding:5px 12px; border-radius:6px;
+    font-size:0.78rem; font-weight:600;
+}}
+.rpt-chip-green {{ background:#ECFDF5; color:#047857; }}
+.rpt-chip-red {{ background:#FEF2F2; color:#B91C1C; }}
+.rpt-chip-purple {{ background:#F5F3FF; color:#6D28D9; }}
+
+.rpt-table-row {{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 0; border-bottom:1px solid #F1F5F9;
+}}
+.rpt-table-row:last-child {{ border-bottom:none; }}
+.rpt-rank {{
+    font-size:0.75rem; font-weight:700; color:#94A3B8;
+    width:28px; text-align:center;
+}}
+.rpt-role-name {{ flex:1; font-size:0.85rem; font-weight:600; color:#334155; }}
+.rpt-role-score {{ font-size:0.88rem; font-weight:800; }}
+
+.rpt-suggestion {{
+    display:flex; align-items:flex-start; gap:10px;
+    padding:10px 0; border-bottom:1px solid #F1F5F9;
+}}
+.rpt-suggestion:last-child {{ border-bottom:none; }}
+.rpt-sug-dot {{
+    width:7px; height:7px; border-radius:50%; margin-top:6px; flex-shrink:0;
+}}
+.rpt-sug-text {{ font-size:0.82rem; color:#475569; line-height:1.5; }}
+
+.rpt-list-item {{
+    font-size:0.83rem; color:#334155; padding:6px 0;
+    border-bottom:1px solid #F8FAFC; font-weight:500;
+}}
+.rpt-list-item:last-child {{ border-bottom:none; }}
+.rpt-list-secondary {{ color:#94A3B8; font-size:0.78rem; font-weight:400; }}
+
+.career-path-item {{
+    display:flex; gap:14px; margin-bottom:16px; position:relative;
+}}
+.career-path-item.last-item {{ margin-bottom:0; }}
+
+.career-timeline {{
+    position:relative; display:flex; flex-direction:column; align-items:center;
+    width:20px; flex-shrink:0;
+}}
+.timeline-node {{
+    width:12px; height:12px; border-radius:50%;
+    background:#FFFFFF; border:3px solid #6366F1;
+    box-shadow:0 0 0 3px rgba(99,102,241,0.1);
+    z-index:2;
+}}
+.timeline-line {{
+    position:absolute; top:12px; left:50%;
+    transform:translateX(-50%);
+    width:2px; height:calc(100% + 16px);
+    background:linear-gradient(180deg, #C7D2FE 0%, #E0E7FF 100%);
+}}
+
+.career-content {{ flex:1; }}
+.career-from {{
+    font-size:0.7rem; font-weight:600; color:#94A3B8;
+    text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px;
+}}
+.career-to {{
+    font-size:0.95rem; font-weight:700; color:#0F172A;
+    margin-bottom:8px; line-height:1.3;
+}}
+.career-meta {{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+}}
+.career-badge {{
+    display:inline-block; padding:4px 10px; border-radius:5px;
+    font-size:0.7rem; font-weight:700; letter-spacing:0.3px;
+}}
+.badge-green {{ background:#D1FAE5; color:#065F46; }}
+.badge-blue {{ background:#DBEAFE; color:#1E40AF; }}
+.badge-orange {{ background:#FED7AA; color:#9A3412; }}
+.career-overlap {{
+    font-size:0.72rem; color:#64748B; font-weight:500;
+}}
+
+.rpt-empty {{ color:#CBD5E1; font-size:0.82rem; font-style:italic; padding:8px 0; }}
+</style></head><body>
+
+<div class="rpt-score-bar">{score_cells}</div>
+
+<div class="rpt-section">Skills Analysis</div>
+<div class="rpt-grid-2">
+    <div class="rpt-card">
+        <div class="rpt-card-title"><span>✅</span> Matched Skills ({len(r_matched)})</div>
+        <div class="rpt-chip-wrap">{matched_chips}</div>
+    </div>
+    <div class="rpt-card">
+        <div class="rpt-card-title"><span>⚠️</span> Skills to Acquire ({len(r_missing)})</div>
+        <div class="rpt-chip-wrap">{missing_chips}</div>
+    </div>
+</div>
+
+<div class="rpt-grid-2">
+    <div class="rpt-card">
+        <div class="rpt-card-title"><span>🎯</span> Top Role Matches</div>
+        {roles_rows}
+    </div>
+    <div class="rpt-card">
+        <div class="rpt-card-title"><span>💡</span> Key Improvements</div>
+        {suggestion_rows}
+    </div>
+</div>
+
+<div class="rpt-section">Profile Details</div>
+<div class="rpt-grid-2">
+    <div>
+        <div class="rpt-card" style="margin-bottom:12px;">
+            <div class="rpt-card-title"><span>🎓</span> Education</div>
+            {edu_items}
+        </div>
+        <div class="rpt-card">
+            <div class="rpt-card-title"><span>💼</span> Experience</div>
+            <div style="text-align:center;padding:8px 0;">
+                <span style="font-size:1.8rem;font-weight:800;color:#F59E0B;">{r_max_yrs}</span>
+                <span style="font-size:0.9rem;font-weight:600;color:#94A3B8;"> years</span>
             </div>
-        </div>''', unsafe_allow_html=True)
-        
-        st.markdown('<div class="spacer-sm"></div>', unsafe_allow_html=True)
-        
-        # Download Button
+        </div>
+    </div>
+    <div>
+        <div class="rpt-card" style="margin-bottom:12px;">
+            <div class="rpt-card-title"><span>📈</span> Career Paths</div>
+            {career_items}
+        </div>
+        <div class="rpt-card">
+            <div class="rpt-card-title"><span>🏅</span> Recommended Certifications</div>
+            <div class="rpt-chip-wrap">{cert_items}</div>
+        </div>
+    </div>
+</div>
+
+</body></html>'''
+
+        components.html(report_html, height=total_h, scrolling=False)
+
+        st.markdown('<div class="spacer-md"></div>', unsafe_allow_html=True)
         col_dl1, col_dl2, col_dl3 = st.columns([1, 1, 1])
         with col_dl2:
             st.download_button(
-                label="📥  Download Full Report (JSON)",
+                label="📥  Download Report (JSON)",
                 data=json.dumps(report, indent=2, default=str),
                 file_name=f"talentiq_report_{target_role.replace(' ', '_')}.json",
                 mime="application/json",
                 use_container_width=True,
             )
         
-        st.markdown('<div class="spacer-md"></div>', unsafe_allow_html=True)
-        
-        # === REPORT GRID - FIXED LAYOUT ===
-        st.markdown('<div class="report-grid">', unsafe_allow_html=True)
-        
-        # Prepare all data for consistent rendering
-        ats_score_val = ats.get("overall_score", 0)
-        skill_coverage = skill_gap.get("coverage_percent", 0)
-        jd_match = jd_comp.get("overall_match_percent", 0) if jd_comp else 0
-        soft_score_val = soft_skill.get("overall_score", 0)
-        
-        matched_skills = skill_gap.get("matched_skills", [])
-        missing_skills = skill_gap.get("missing_skills", [])
-        top_roles = role_matches.get("top_roles", [])[:5]
-        improvements_list = improvements.get("suggestions", [])[:10]
-        
-        edu_data = profile.get("education", {})
-        exp_data = profile.get("experience", {})
-        degrees = edu_data.get("degrees", []) if isinstance(edu_data, dict) else []
-        max_years = exp_data.get("max_years", 0) if isinstance(exp_data, dict) else 0
-        
-        career_paths = career.get("paths", [])[:5]
-        cert_suggestions = certifications.get("recommended", [])[:8]
-        industry_data = industry.get("alignment_score", 0) if industry else 0
-        
-        # ROW 1: Overview Cards
-        r1c1, r1c2, r1c3, r1c4 = st.columns(4)
-        
-        with r1c1:
-            st.markdown(f'''
-            <div class="report-box">
-                <div class="report-box-header">
-                    <div class="rb-icon" style="background:#EEF2FF;">🎯</div>
-                    <div class="rb-title">ATS Score</div>
-                    <div class="rb-badge badge-{_badge_cls(ats_score_val).replace("badge-", "")}">{_label(ats_score_val)[:4]}</div>
-                </div>
-                <div class="report-box-body">
-                    <div class="rb-metric">
-                        <div class="rb-metric-value">{ats_score_val:.0f}</div>
-                        <div class="rb-metric-unit">/ 100</div>
-                    </div>
-                    <div class="rb-metric-label">Overall ATS Performance</div>
-                    <div class="rb-progress">
-                        <div class="rb-progress-fill" style="width:{ats_score_val}%;background:{_color_for_score(ats_score_val)};"></div>
-                    </div>
-                    <div style="margin-top:12px;">
-                        <div class="rb-stat-row">
-                            <span class="rb-stat-label">Keyword Match</span>
-                            <span class="rb-stat-value">{ats.get("keyword_match", 0):.0f}%</span>
-                        </div>
-                        <div class="rb-stat-row">
-                            <span class="rb-stat-label">Format Score</span>
-                            <span class="rb-stat-value">{ats.get("format_score", 0):.0f}%</span>
-                        </div>
-                        <div class="rb-stat-row">
-                            <span class="rb-stat-label">Structure Score</span>
-                            <span class="rb-stat-value">{ats.get("structure_score", 0):.0f}%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>''', unsafe_allow_html=True)
-        
-        with r1c2:
-            st.markdown(f'''
-            <div class="report-box">
-                <div class="report-box-header">
-                    <div class="rb-icon" style="background:#F0FDFA;">🔧</div>
-                    <div class="rb-title">Skills Coverage</div>
-                    <div class="rb-badge" style="background:#ECFDF5;color:#047857;">{len(matched_skills)}</div>
-                </div>
-                <div class="report-box-body">
-                    <div class="rb-metric">
-                        <div class="rb-metric-value">{skill_coverage:.0f}</div>
-                        <div class="rb-metric-unit">%</div>
-                    </div>
-                    <div class="rb-metric-label">Matched Skills Coverage</div>
-                    <div class="rb-progress">
-                        <div class="rb-progress-fill" style="width:{skill_coverage}%;background:{_color_for_score(skill_coverage)};"></div>
-                    </div>
-                    <div style="margin-top:12px;">
-                        <div class="rb-stat-row">
-                            <span class="rb-stat-label">Matched Skills</span>
-                            <span class="rb-stat-value">{len(matched_skills)}</span>
-                        </div>
-                        <div class="rb-stat-row">
-                            <span class="rb-stat-label">Missing Skills</span>
-                            <span class="rb-stat-value" style="color:#DC2626;">{len(missing_skills)}</span>
-                        </div>
-                        <div class="rb-stat-row">
-                            <span class="rb-stat-label">Skill Gap</span>
-                            <span class="rb-stat-value">{100-skill_coverage:.0f}%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>''', unsafe_allow_html=True)
-        
-        with r1c3:
-            st.markdown(f'''
-            <div class="report-box">
-                <div class="report-box-header">
-                    <div class="rb-icon" style="background:#FEF3C7;">📋</div>
-                    <div class="rb-title">JD Alignment</div>
-                    <div class="rb-badge badge-{_badge_cls(jd_match).replace("badge-", "")}">{_label(jd_match)[:4]}</div>
-                </div>
-                <div class="report-box-body">
-                    <div class="rb-metric">
-                        <div class="rb-metric-value">{jd_match:.0f}</div>
-                        <div class="rb-metric-unit">%</div>
-                    </div>
-                    <div class="rb-metric-label">Job Description Match</div>
-                    <div class="rb-progress">
-                        <div class="rb-progress-fill" style="width:{jd_match}%;background:{_color_for_score(jd_match)};"></div>
-                    </div>
-                    <div style="margin-top:12px;">
-                        <div class="rb-stat-row">
-                            <span class="rb-stat-label">Matched Keywords</span>
-                            <span class="rb-stat-value">{len(jd_comp.get("matched_keywords", [])) if jd_comp else 0}</span>
-                        </div>
-                        <div class="rb-stat-row">
-                            <span class="rb-stat-label">Missing Keywords</span>
-                            <span class="rb-stat-value" style="color:#DC2626;">{len(jd_comp.get("missing_keywords", [])) if jd_comp else 0}</span>
-                        </div>
-                        <div class="rb-stat-row">
-                            <span class="rb-stat-label">Relevance</span>
-                            <span class="rb-stat-value">{jd_comp.get("relevance_score", 0):.0f}%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>''', unsafe_allow_html=True)
-        
-        with r1c4:
-            st.markdown(f'''
-            <div class="report-box">
-                <div class="report-box-header">
-                    <div class="rb-icon" style="background:#FDF2F8;">💡</div>
-                    <div class="rb-title">Profile Summary</div>
-                </div>
-                <div class="report-box-body">
-                    <div class="rb-stat-row">
-                        <span class="rb-stat-label">Experience</span>
-                        <span class="rb-stat-value">{max_years} years</span>
-                    </div>
-                    <div class="rb-stat-row">
-                        <span class="rb-stat-label">Education</span>
-                        <span class="rb-stat-value">{len(degrees)} degree(s)</span>
-                    </div>
-                    <div class="rb-stat-row">
-                        <span class="rb-stat-label">Total Skills</span>
-                        <span class="rb-stat-value">{len(profile.get("skills_normalized", []))}</span>
-                    </div>
-                    <div class="rb-stat-row">
-                        <span class="rb-stat-label">Soft Skills</span>
-                        <span class="rb-stat-value">{soft_score_val:.0f}%</span>
-                    </div>
-                    <div class="rb-stat-row">
-                        <span class="rb-stat-label">Industry Fit</span>
-                        <span class="rb-stat-value">{industry_data:.0f}%</span>
-                    </div>
-                    <div class="rb-stat-row">
-                        <span class="rb-stat-label">Target Role</span>
-                        <span class="rb-stat-value" style="font-size:0.8rem;color:#6366F1;">{target_role[:20]}{"…" if len(target_role)>20 else ""}</span>
-                    </div>
-                </div>
-            </div>''', unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('<div style="margin:1rem 0;"></div>', unsafe_allow_html=True)
-        
-        # ROW 2: Skills & Roles
-        st.markdown('<div class="report-grid">', unsafe_allow_html=True)
-        
-        r2c1, r2c2, r2c3, r2c4 = st.columns(4)
-        
-        with r2c1:
-            matched_html = '<ul class="rb-list">'
-            if matched_skills:
-                for skill in matched_skills[:15]:
-                    matched_html += f'<li class="rb-list-item"><span class="rb-list-dot"></span><span class="rb-list-text">{skill}</span></li>'
-            else:
-                matched_html += '<div class="rb-empty">No matched skills</div>'
-            matched_html += '</ul>'
-            
-            st.markdown(f'''
-            <div class="report-box">
-                <div class="report-box-header">
-                    <div class="rb-icon" style="background:#ECFDF5;">✅</div>
-                    <div class="rb-title">Matched Skills</div>
-                    <div class="rb-badge" style="background:#ECFDF5;color:#047857;">{len(matched_skills)}</div>
-                </div>
-                <div class="report-box-body">
-                    {matched_html}
-                </div>
-            </div>''', unsafe_allow_html=True)
-        
-        with r2c2:
-            missing_html = '<ul class="rb-list">'
-            if missing_skills:
-                for skill in missing_skills[:15]:
-                    skill_name = skill if isinstance(skill, str) else skill.get("skill", "")
-                    missing_html += f'<li class="rb-list-item"><span class="rb-list-dot" style="background:#DC2626;"></span><span class="rb-list-text">{skill_name}</span></li>'
-            else:
-                missing_html += '<div class="rb-empty">No skill gaps detected</div>'
-            missing_html += '</ul>'
-            
-            st.markdown(f'''
-            <div class="report-box">
-                <div class="report-box-header">
-                    <div class="rb-icon" style="background:#FEF2F2;">⚠️</div>
-                    <div class="rb-title">Missing Skills</div>
-                    <div class="rb-badge" style="background:#FEF2F2;color:#DC2626;">{len(missing_skills)}</div>
-                </div>
-                <div class="report-box-body">
-                    {missing_html}
-                </div>
-            </div>''', unsafe_allow_html=True)
-        
-        with r2c3:
-            roles_html = '<ul class="rb-list">'
-            if top_roles:
-                for idx, role in enumerate(top_roles):
-                    score = role.get("score", 0) * 100
-                    role_name = role.get("role_name", "Unknown")
-                    roles_html += f'<li class="rb-list-item"><span class="rb-list-dot"></span><span class="rb-list-text"><b>{role_name}</b> <span style="color:#6366F1;font-weight:700;margin-left:4px;">{score:.0f}%</span></span></li>'
-            else:
-                roles_html += '<div class="rb-empty">No role matches available</div>'
-            roles_html += '</ul>'
-            
-            st.markdown(f'''
-            <div class="report-box">
-                <div class="report-box-header">
-                    <div class="rb-icon" style="background:#EEF2FF;">🎯</div>
-                    <div class="rb-title">Top Role Matches</div>
-                </div>
-                <div class="report-box-body">
-                    {roles_html}
-                </div>
-            </div>''', unsafe_allow_html=True)
-        
-        with r2c4:
-            improvements_html = '<ul class="rb-list">'
-            if improvements_list:
-                for imp in improvements_list[:12]:
-                    msg = imp.get("message", "") if isinstance(imp, dict) else str(imp)
-                    improvements_html += f'<li class="rb-list-item"><span class="rb-list-dot" style="background:#F59E0B;"></span><span class="rb-list-text">{msg[:80]}{"…" if len(msg)>80 else ""}</span></li>'
-            else:
-                improvements_html += '<div class="rb-empty">No improvements suggested</div>'
-            improvements_html += '</ul>'
-            
-            st.markdown(f'''
-            <div class="report-box">
-                <div class="report-box-header">
-                    <div class="rb-icon" style="background:#FFFBEB;">💡</div>
-                    <div class="rb-title">Improvements</div>
-                    <div class="rb-badge" style="background:#FFFBEB;color:#A16207;">{len(improvements_list)}</div>
-                </div>
-                <div class="report-box-body">
-                    {improvements_html}
-                </div>
-            </div>''', unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('<div style="margin:1rem 0;"></div>', unsafe_allow_html=True)
-        
-        # ROW 3: Career & Certifications
-        st.markdown('<div class="report-grid">', unsafe_allow_html=True)
-        
-        r3c1, r3c2, r3c3, r3c4 = st.columns(4)
-        
-        with r3c1:
-            career_html = '<ul class="rb-list">'
-            if career_paths:
-                for path in career_paths:
-                    path_type = path.get("type", "Unknown")
-                    target = path.get("target_role", "")
-                    timeline = path.get("timeline", "")
-                    career_html += f'<li class="rb-list-item"><span class="rb-list-dot"></span><span class="rb-list-text"><b>{target}</b> <span style="color:#94A3B8;font-size:0.8rem;">({timeline})</span></span></li>'
-            else:
-                career_html += '<div class="rb-empty">No career paths available</div>'
-            career_html += '</ul>'
-            
-            st.markdown(f'''
-            <div class="report-box">
-                <div class="report-box-header">
-                    <div class="rb-icon" style="background:#F0F9FF;">📈</div>
-                    <div class="rb-title">Career Paths</div>
-                </div>
-                <div class="report-box-body">
-                    {career_html}
-                </div>
-            </div>''', unsafe_allow_html=True)
-        
-        with r3c2:
-            cert_html = '<ul class="rb-list">'
-            if cert_suggestions:
-                for cert in cert_suggestions:
-                    cert_name = cert.get("name", "") if isinstance(cert, dict) else str(cert)
-                    priority = cert.get("priority", "medium") if isinstance(cert, dict) else "medium"
-                    cert_html += f'<li class="rb-list-item"><span class="rb-list-dot" style="background:#8B5CF6;"></span><span class="rb-list-text">{cert_name}</span></li>'
-            else:
-                cert_html += '<div class="rb-empty">No certifications recommended</div>'
-            cert_html += '</ul>'
-            
-            st.markdown(f'''
-            <div class="report-box">
-                <div class="report-box-header">
-                    <div class="rb-icon" style="background:#FDF4FF;">🏆</div>
-                    <div class="rb-title">Certifications</div>
-                    <div class="rb-badge" style="background:#FDF4FF;color:#A21CAF;">{len(cert_suggestions)}</div>
-                </div>
-                <div class="report-box-body">
-                    {cert_html}
-                </div>
-            </div>''', unsafe_allow_html=True)
-        
-        with r3c3:
-            edu_html = '<ul class="rb-list">'
-            if degrees:
-                for deg in degrees:
-                    edu_html += f'<li class="rb-list-item"><span class="rb-list-dot"></span><span class="rb-list-text">{deg}</span></li>'
-            else:
-                edu_html += '<div class="rb-empty">No education detected</div>'
-            
-            institutions = edu_data.get("institutions", []) if isinstance(edu_data, dict) else []
-            if institutions:
-                edu_html += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-light);"><div style="font-size:0.75rem;font-weight:700;color:#6366F1;margin-bottom:6px;">INSTITUTIONS</div>'
-                for inst in institutions[:3]:
-                    edu_html += f'<li class="rb-list-item" style="font-size:0.82rem;"><span class="rb-list-dot" style="width:4px;height:4px;"></span><span class="rb-list-text">{inst}</span></li>'
-                edu_html += '</div>'
-            edu_html += '</ul>'
-            
-            st.markdown(f'''
-            <div class="report-box">
-                <div class="report-box-header">
-                    <div class="rb-icon" style="background:#EEF2FF;">🎓</div>
-                    <div class="rb-title">Education</div>
-                    <div class="rb-badge" style="background:#EEF2FF;color:#4338CA;">{len(degrees)}</div>
-                </div>
-                <div class="report-box-body">
-                    {edu_html}
-                </div>
-            </div>''', unsafe_allow_html=True)
-        
-        with r3c4:
-            job_titles = exp_data.get("job_titles", []) if isinstance(exp_data, dict) else []
-            exp_html = f'''
-            <div style="text-align:center;padding:20px 0;">
-                <div style="font-size:2.5rem;font-weight:800;color:#F59E0B;line-height:1;">{max_years}</div>
-                <div style="font-size:0.85rem;color:#94A3B8;margin-top:4px;font-weight:600;">YEARS EXPERIENCE</div>
-            </div>
-            <ul class="rb-list" style="margin-top:12px;">'''
-            if job_titles:
-                for title in job_titles[:8]:
-                    exp_html += f'<li class="rb-list-item"><span class="rb-list-dot"></span><span class="rb-list-text">{title}</span></li>'
-            else:
-                exp_html += '<div class="rb-empty">No job titles found</div>'
-            exp_html += '</ul>'
-            
-            st.markdown(f'''
-            <div class="report-box">
-                <div class="report-box-header">
-                    <div class="rb-icon" style="background:#FEF3C7;">💼</div>
-                    <div class="rb-title">Experience</div>
-                </div>
-                <div class="report-box-body">
-                    {exp_html}
-                </div>
-            </div>''', unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        st.markdown('<div class="spacer-lg"></div>', unsafe_allow_html=True)
-        
-        # Raw JSON Expander
-        with st.expander("🔍 View Raw JSON Data", expanded=False):
-            st.json(report)
+       
 
 
 # ── No File Warning ──────────────────────────────────────────────────────
